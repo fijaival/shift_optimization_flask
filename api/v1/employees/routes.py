@@ -7,7 +7,7 @@ from ..qualifications import Qualification
 from ..employee_qualifications import EmployeeQualification
 from ..employee_restrictions import EmployeeRestriction
 from .models import Employee
-from .schemas import employees_schema
+from .schemas import employee_schema, employees_schema
 
 employees_bp = Blueprint('employees', __name__)
 
@@ -148,12 +148,12 @@ def update_employee(employee_id):
         return jsonify({"message": "Employee not found"}), 404
 
     data = request.json
+    errors = employee_schema.validate(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
 
-    # 従業員の基本情報の更新
-    if 'last_name' in data:
-        employee.last_name = data['last_name']
-    if 'first_name' in data:
-        employee.first_name = data['first_name']
+    employee.last_name = data['last_name']
+    employee.first_name = data['first_name']
 
     db.session.commit()
 

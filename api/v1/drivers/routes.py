@@ -3,6 +3,8 @@ from extensions import db
 from flask import Blueprint, jsonify, request
 from ..employees import employees_schema
 from .models import Driver
+from .schemas import driver_schema, drivers_schema
+
 
 drivers_bp = Blueprint('drivers', __name__)
 
@@ -12,14 +14,16 @@ drivers_bp = Blueprint('drivers', __name__)
 @drivers_bp.route('/', methods=["GET"])
 def get_all_drivers():
     data = Driver.query.all()
-    return jsonify(employees_schema.dump(data))
-
+    return jsonify(drivers_schema.dump(data, many=True))
 # ドライバー追加
 
 
 @drivers_bp.route('/', methods=['POST'])
 def add_driver():
     data = request.json
+    errors = driver_schema.validate(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
     new_driver = Driver(
         last_name=data['last_name'],
         first_name=data['first_name']

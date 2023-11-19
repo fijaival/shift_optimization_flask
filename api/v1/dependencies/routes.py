@@ -3,6 +3,7 @@ from extensions import db
 from flask import Blueprint, jsonify, request
 
 from .models import EmployeeDependency
+from .schemas import employee_dependency_schema
 
 
 dependencies_bp = Blueprint('dependencies', __name__)
@@ -44,9 +45,9 @@ def add_dependency():
     from ..employees import Employee
     data = request.json
 
-    # 必要なデータがPOSTリクエストに含まれているか確認
-    if not all(key in data for key in ["dependent_employee_id", "required_employee_id"]):
-        return jsonify({"message": "Missing data"}), 400
+    errors = employee_dependency_schema.validate(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
 
     # dependent_employeeが存在するか確認
     dependent_employee = db.session.query(Employee).filter_by(
@@ -76,13 +77,17 @@ def add_dependency():
 @dependencies_bp.route('/<int:dep_id>', methods=['PUT'])
 def update_dependency(dep_id):
     from ..employees import Employee
+
+    data = request.json
+    errors = employee_dependency_schema.validate(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
+
     dependency = db.session.query(
         EmployeeDependency).filter_by(id=dep_id).first()
 
     if not dependency:
         return jsonify({"message": "Dependency not found"}), 404
-
-    data = request.json
 
     # 依存関係の更新
     if 'dependent_employee_id' in data:

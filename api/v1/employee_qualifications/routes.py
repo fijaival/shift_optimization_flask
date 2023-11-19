@@ -5,6 +5,7 @@ from ..employees import Employee
 from ..qualifications import Qualification
 
 from .models import EmployeeQualification
+from .schemas import employee_qualification_schema
 
 
 employees_qualifications_bp = Blueprint('employees_qualifications', __name__)
@@ -40,9 +41,9 @@ def get_all_employee_qualifications():
 def add_employee_qualification():
     data = request.json
 
-    # 必要なデータがPOSTリクエストに含まれているか確認
-    if not all(key in data for key in ["employee_id", "qualification_id"]):
-        return jsonify({"message": "Missing data"}), 400
+    errors = employee_qualification_schema.validate(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
 
     # 従業員が存在するか確認
     employee = db.session.query(Employee).filter_by(

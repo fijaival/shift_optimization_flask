@@ -5,6 +5,7 @@ from ..restrictions import Restriction
 from ..employees import Employee
 
 from .models import EmployeeRestriction
+from .schemas import employee_restriction_schema
 
 employees_restrictions_bp = Blueprint('employees_restrictions', __name__)
 
@@ -40,9 +41,9 @@ def get_all_employee_restrictions():
 def add_employee_restriction():
     data = request.json
 
-    # 必要なデータがPOSTリクエストに含まれているか確認
-    if not all(key in data for key in ["employee_id", "restriction_id", "value"]):
-        return jsonify({"message": "Missing data"}), 400
+    errors = employee_restriction_schema.validate(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
 
     # 従業員が存在するか確認
     employee = db.session.query(Employee).filter_by(
@@ -95,6 +96,9 @@ def update_employee_restriction(er_id):
         return jsonify({"message": "Employee restriction not found"}), 404
 
     data = request.json
+    errors = employee_restriction_schema.validate(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
 
     # 制限情報の更新
     if 'value' in data:

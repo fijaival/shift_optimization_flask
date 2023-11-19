@@ -22,7 +22,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 
 API リクエストボディ<br>
 
-POST /restrictions
+POST /qualifications
 
 ```
 {
@@ -61,6 +61,15 @@ POST /employees_restrictions
 }
 ```
 
+POST /employees_qualifications
+
+```
+{
+    "employee_id":1,
+    "qualification_id":1
+}
+```
+
 POST /dependencies
 
 ```
@@ -68,4 +77,29 @@ POST /dependencies
     "dependent_employee_id":6,
     "required_employee_id":12
 }
+```
+
+POST /drivers
+
+```
+{
+    "last_name": "中田",
+    "first_name": "正弘"
+}
+```
+
+POST /shifts_requests
+
+```
+[{"eployee_id": 1, "date": "2023-11-03", "type_of_vacation": "公"},
+ {"eployee_id": 1, "date": "2023-11-04", "type_of_vacation": "公"},
+ {"eployee_id": 1, "date": "2023-11-10", "type_of_vacation": "公"}]
+```
+
+POST /drives_requests
+
+```
+[{"driver_id": 1, "date": "2023-11-03", "type_of_vacation": "公"},
+ {"driver_id": 1, "date": "2023-11-04", "type_of_vacation": "公"},
+ {"driver_id": 1, "date": "2023-11-10", "type_of_vacation": "公"}]
 ```
