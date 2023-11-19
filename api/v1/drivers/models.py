@@ -12,3 +12,4 @@ class Driver(db.Model):
     first_name = Column(String)
 
     drivers_requests = relationship("DriversRequests", back_populates="driver")
+    drivers_shifts = relationship("DriversShift", back_populates="driver")

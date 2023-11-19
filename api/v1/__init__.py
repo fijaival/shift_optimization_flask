@@ -9,6 +9,7 @@ from .drivers import drivers_bp
 from .shifts_requests import shifts_requests_bp
 from .drivers_requests import drivers_requests_bp
 from .shifts import shifts_bp
+from .drivers_shifts import drivers_shifts_bp
 
 api_v1_bp = Blueprint('api_v1', __name__)
 
@@ -28,3 +29,5 @@ api_v1_bp.register_blueprint(
     drivers_requests_bp, url_prefix='/drivers_requests')
 api_v1_bp.register_blueprint(
     shifts_bp, url_prefix='/shifts')
+api_v1_bp.register_blueprint(
+    drivers_shifts_bp, url_prefix='/drivers_shifts')

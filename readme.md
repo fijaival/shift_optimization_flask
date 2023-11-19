@@ -19,3 +19,53 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 ```
 .venv\Scripts\activate
 ```
+
+API リクエストボディ<br>
+
+POST /restrictions
+
+```
+{
+"name":"日勤相談員"
+}
+```
+
+POST /restrictions
+
+```
+{
+"name":"連続勤務"
+}
+```
+
+POST /employees
+
+```
+{
+    "last_name": "中田",
+    "first_name": "正弘",
+    "qualifications":[5],
+    "restrictions":[
+    ],
+    "dependencies":[]
+}
+```
+
+POST /employees_restrictions
+
+```
+{
+    "employee_id":1,
+    "restriction_id":"1",
+    "value":4
+}
+```
+
+POST /dependencies
+
+```
+{
+    "dependent_employee_id":6,
+    "required_employee_id":12
+}
+```

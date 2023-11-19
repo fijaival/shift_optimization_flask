@@ -43,17 +43,22 @@ def add_shifts():
     db.session.commit()
     return jsonify({"message": "Shifts added successfully!"}), 201
 
-# DELETEリクエスト（シフトの削除）
+# シフトの月単位での一括削除
 
 
-@shifts_bp.route('/<int:shift_id>', methods=['DELETE'])
-def delete_shift(shift_id):
-    shift = Shift.query.get(shift_id)
-    if not shift:
-        return jsonify({"message": "Shift not found"}), 404
-    db.session.delete(shift)
+@shifts_bp.route('/<int:year>/<int:month>', methods=['DELETE'])
+def delete_shift(year, month):
+    shifts = Shift.query.filter(
+        extract('year', Shift.date) == year,
+        extract('month', Shift.date) == month
+    ).all()
+
+    # 見つかったシフトをすべて削除
+    for shift in shifts:
+        db.session.delete(shift)
+
     db.session.commit()
-    return jsonify({"message": "Shift deleted successfully!"}), 200
+    return jsonify({"message": f"shifts for {year}-{month} deleted successfully!"}), 200
 
 
 # PUTリクエスト（シフト情報の更新）
