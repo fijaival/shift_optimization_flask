@@ -27,6 +27,9 @@ def add_shifts():
     shifts_data = request.json
 
     for shift_data in shifts_data:
+        errors = shift_schema.validate(shift_data)
+        if errors:
+            return jsonify({"errors": errors}), 400
         # 従業員IDの存在を確認
         employee = Employee.query.get(shift_data['employee_id'])
         if not employee:

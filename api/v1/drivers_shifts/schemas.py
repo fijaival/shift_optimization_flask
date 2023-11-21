@@ -3,7 +3,7 @@ from extensions import ma
 
 
 class DriversShiftSchema(ma.SQLAlchemyAutoSchema):
-    id = fields.Int()
+    id = fields.Int(dump_only=True)
     driver_id = fields.Int()
     date = fields.Date()
     type_of_work = fields.Str()

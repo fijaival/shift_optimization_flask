@@ -3,7 +3,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy import extract
 from datetime import datetime
 from .models import DriversShift
-from .schemas import drivers_shifts_schema
+from .schemas import drivers_shift_schema, drivers_shifts_schema
 # Driverモデルのインポートが必要です
 from ..drivers import Driver
 
@@ -26,13 +26,15 @@ def get_driver_shifts_for_month(year, month):
 @drivers_shifts_bp.route('/', methods=['POST'])
 def add_driver_shifts():
     shifts_data = request.json
-    not_found_drivers = []
 
     for shift_data in shifts_data:
+        errors = drivers_shift_schema.validate(shift_data)
+        if errors:
+            return jsonify({"errors": errors}), 400
+        # 従業員IDの存在を確認
         driver = Driver.query.get(shift_data['driver_id'])
         if not driver:
-            not_found_drivers.append(shift_data['driver_id'])
-            continue  # ドライバーが見つからなければこのシフトをスキップ
+            return jsonify({"message": f"driver with ID {shift_data['driver_id']} not found"}), 404
 
         new_shift = DriversShift(
             driver_id=shift_data['driver_id'],
@@ -44,8 +46,7 @@ def add_driver_shifts():
     db.session.commit()
     return jsonify({
         "message": "Driver shifts added successfully!",
-        "not_found_drivers": not_found_drivers
-    }), 201 if not_found_drivers else 200
+    }), 201
 
 # 専属ドライバーのシフトの月単位での一括削除
 
