@@ -18,7 +18,6 @@ def get_all_dependencies():
 
     # dependenciesテーブルから情報を取得
     dependencies = db.session.query(EmployeeDependency).all()
-
     dependencies_data = []
     for dep in dependencies:
         dependent_employee = db.session.query(Employee).filter_by(

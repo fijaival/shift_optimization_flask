@@ -13,7 +13,7 @@ drivers_requests_bp = Blueprint('drivers_requests', __name__)
 
 # 特定の月のシフト希望取得
 @drivers_requests_bp.route('/<int:year>/<int:month>', methods=['GET'])
-def get_shift_requests_for_month(year, month):
+def get_drivers_requests_for_month(year, month):
     shift_requests = DriversRequests.query.filter(
         extract('year', DriversRequests.date) == year,
         extract('month', DriversRequests.date) == month

@@ -91,9 +91,9 @@ POST /drivers
 POST /shifts_requests
 
 ```
-[{"eployee_id": 1, "date": "2023-11-03", "type_of_vacation": "公"},
- {"eployee_id": 1, "date": "2023-11-04", "type_of_vacation": "公"},
- {"eployee_id": 1, "date": "2023-11-10", "type_of_vacation": "公"}]
+[{"employee_id": 1, "date": "2023-11-03", "type_of_vacation": "公"},
+ {"employee_id": 1, "date": "2023-11-04", "type_of_vacation": "公"},
+ {"employee_id": 1, "date": "2023-11-10", "type_of_vacation": "公"}]
 ```
 
 POST /drives_requests
