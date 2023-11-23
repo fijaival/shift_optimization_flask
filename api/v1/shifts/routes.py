@@ -1,3 +1,4 @@
+from sqlalchemy import extract, between
 from extensions import db
 from flask import Blueprint, jsonify, request
 from .models import Shift
@@ -14,9 +15,10 @@ shifts_bp = Blueprint('shifts', __name__)
 
 @shifts_bp.route('/<int:year>/<int:month>', methods=["GET"])
 def get_shifts_for_month(year, month):
+
     shifts = Shift.query.filter(
         extract('year', Shift.date) == year,
-        extract('month', Shift.date) == month
+        extract('month', Shift.date) == month,
     ).all()
     return jsonify(shifts_schema.dump(shifts))
 

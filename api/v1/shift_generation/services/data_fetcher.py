@@ -1,4 +1,5 @@
 # データ取得関数は再定義（不要な情報は取得しない）
+from sqlalchemy.orm import joinedload
 from extensions import db
 from ...employees import Employee, employees_schema
 from ...drivers import Driver, drivers_schema
@@ -11,9 +12,10 @@ from ...employee_qualifications import EmployeeQualification, employee_qualifica
 from ...employee_restrictions import EmployeeRestriction, employee_restriction_schema
 from ...restrictions import Restriction, restriction_schema
 
-
+import calendar
 from flask import Blueprint, jsonify, request
-from sqlalchemy import extract
+from sqlalchemy import extract, between
+from datetime import date
 
 # employee
 
@@ -111,3 +113,58 @@ def fetch_shifts_for_month(year, month):
         extract('month', Shift.date) == month
     ).all()
     return jsonify(shifts_schema.dump(shifts))
+
+
+def get_all_employees_details():
+    # joinedload を使用して関連データを一括で取得
+    employees = db.session.query(Employee).options(
+        joinedload(Employee.qualifications),
+        joinedload(Employee.restrictions),
+        joinedload(Employee.dependencies),
+    ).all()
+    year = 2023
+    month = 11
+    last_month = month - 1
+
+    # 月末の7日間の範囲を設定
+    last_day = calendar.monthrange(year, last_month)[1]
+    start_date = date(year, last_month, last_day - 6)
+    end_date = date(year, last_month, last_day)
+
+    all_employees_data = []
+
+    for employee in employees:
+
+        shift_requests = ShiftRequest.query.filter(
+            ShiftRequest.employee_id == employee.id,
+            extract('year', ShiftRequest.date) == year,
+            extract('month', ShiftRequest.date) == month
+        ).all()
+
+        shifts = Shift.query.filter(
+            Shift.employee_id == employee.id,
+            extract('year', Shift.date) == year,
+            extract('month', Shift.date) == last_month,
+            Shift.date.between(start_date, end_date)
+        ).all()
+
+        # 従業員の基本情報
+        employee_data = {
+            "id": employee.id,
+            "name": employee.last_name + employee.first_name,
+            "qualifications": [q.qualification.name for q in employee.qualifications],
+            "restrictions": [{
+                "name": r.restriction.name,
+                "value": r.value}
+                for r in employee.restrictions
+            ],
+            "dependencies": [d.required_employee_id for d in employee.dependencies],
+            "shifts": [s.type_of_work for s in shifts],
+            "shift_requests": [request.date.day for request in shift_requests],
+            "paid": [request.date.day for request in shift_requests if request.type_of_vacation == "有"]
+
+        }
+
+        all_employees_data.append(employee_data)
+
+    return jsonify(all_employees_data)
