@@ -1,4 +1,4 @@
-from .data_fetcher import fetch_all_employees, fetch_all_drivers, fetch_shift_requests_for_month, fetch_drivers_requests_for_month, fetch_qualifications, fetch_restrictions, fetch_all_dependencies, fetch_shifts_for_month, get_all_employees_details
+from .data_fetcher import fetch_all_employees, fetch_all_drivers, fetch_shift_requests_for_month, fetch_drivers_requests_for_month, fetch_qualifications, fetch_restrictions, fetch_all_dependencies, fetch_shifts_for_month, get_all_employees_details, fetch_all_drivers_details
 
 from datetime import datetime
 
@@ -20,5 +20,6 @@ def totake():
     all_dependencies = fetch_all_dependencies()
     shifts_for_month = fetch_shifts_for_month(current_year, current_month-1)
     all = get_all_employees_details()
+    all_driver = fetch_all_drivers_details()
 
-    return all
+    return all_driver

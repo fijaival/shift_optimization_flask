@@ -141,7 +141,7 @@ def get_all_employees_details():
             extract('month', ShiftRequest.date) == month
         ).all()
 
-        shifts = Shift.query.filter(
+        last_month_shifts = Shift.query.filter(
             Shift.employee_id == employee.id,
             extract('year', Shift.date) == year,
             extract('month', Shift.date) == last_month,
@@ -159,7 +159,7 @@ def get_all_employees_details():
                 for r in employee.restrictions
             ],
             "dependencies": [d.required_employee_id for d in employee.dependencies],
-            "shifts": [s.type_of_work for s in shifts],
+            "last_month_shifts": [s.type_of_work for s in last_month_shifts],
             "shift_requests": [request.date.day for request in shift_requests],
             "paid": [request.date.day for request in shift_requests if request.type_of_vacation == "有"]
 
@@ -168,3 +168,28 @@ def get_all_employees_details():
         all_employees_data.append(employee_data)
 
     return jsonify(all_employees_data)
+
+
+def fetch_all_drivers_details():
+    drivers = db.session.query(Driver).all()
+    year = 2023
+    month = 11
+
+    all_drivers_data = []
+
+    for driver in drivers:
+        shift_requests = DriversRequests.query.filter(
+            DriversRequests.driver_id == driver.id,
+            extract('year', DriversRequests.date) == year,
+            extract('month', DriversRequests.date) == month
+        ).all()
+
+        driver_data = {
+            "id": driver.id,
+            "name": driver.last_name + driver.first_name,
+            "driver_requests": [request.date.day for request in shift_requests]
+        }
+
+        all_drivers_data.append(driver_data)
+
+    return jsonify(all_drivers_data)
