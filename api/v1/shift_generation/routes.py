@@ -1,11 +1,20 @@
 
-from flask import Blueprint, jsonify, request
-from .services.optimizer import totake
+from flask import Blueprint, request, jsonify
+from .optimizer import optimize
 
 shift_generation_bp = Blueprint('shift_generation', __name__)
 
 
-@shift_generation_bp.route('/', methods=["GET"])
-def employees():
-    test = totake()
+@shift_generation_bp.route('/<int:year>/<int:month>', methods=["GET"])
+def get_shift(year, month):
+    holiday_set = request.args.get('holiday_set')
+
+    if holiday_set is None:
+        return jsonify({'error': 'Missing required parameter: holiday_set'}), 400
+
+    try:
+        holiday_set = int(holiday_set)
+    except ValueError:
+        return jsonify({'error': 'Invalid value for holiday_set, must be an integer'}), 400
+    test = optimize(year, month, holiday_set)
     return test
