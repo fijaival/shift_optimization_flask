@@ -11,6 +11,7 @@ from .drivers_requests import drivers_requests_bp
 from .shifts import shifts_bp
 from .drivers_shifts import drivers_shifts_bp
 from .shift_generation import shift_generation_bp
+from .auth import auth_bp
 
 api_v1_bp = Blueprint('api_v1', __name__)
 
@@ -34,3 +35,5 @@ api_v1_bp.register_blueprint(
     drivers_shifts_bp, url_prefix='/drivers_shifts')
 api_v1_bp.register_blueprint(
     shift_generation_bp, url_prefix='/shift_generation')
+api_v1_bp.register_blueprint(
+    auth_bp, url_prefix='/auth')
