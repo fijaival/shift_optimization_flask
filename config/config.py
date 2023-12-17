@@ -10,8 +10,8 @@ class Config:
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
     JWT_ALGORITHM = 'HS256'
     JWT_LEEWAY = 0
-    JWT_EXPIRATION_DELTA = timedelta(seconds=300)
-    JWT_NOT_BEFORE_DELTA = timedelta(seconds=0)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=24)
 
     SQLALCHEMY_DATABASE_URI = 'sqlite:///order.sqlite3'
     SQLALCHEMY_TRACK_MODIFICATIONS = False

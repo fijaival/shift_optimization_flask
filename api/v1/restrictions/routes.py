@@ -1,6 +1,7 @@
 from extensions import db  # これは書き替え
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 
 from .models import Restriction
 from .schemas import restriction_schema, restrictions_schema
@@ -11,6 +12,7 @@ restrictions_bp = Blueprint('restrictions', __name__)
 
 
 @restrictions_bp.route('/', methods=['POST'])
+@jwt_required()
 def add_restriction():
     data = request.json
     errors = restriction_schema.validate(data)
@@ -29,6 +31,7 @@ def add_restriction():
 
 
 @restrictions_bp.route('/', methods=["GET"])
+@jwt_required()
 def get_restriction():
     data = Restriction.query.all()
     return jsonify(restrictions_schema.dump(data))
@@ -37,6 +40,7 @@ def get_restriction():
 
 
 @restrictions_bp.route('/<int:res_id>', methods=['DELETE'])
+@jwt_required()
 def delete_restriction(res_id):
     restriction = db.session.query(Restriction).filter_by(id=res_id).first()
 

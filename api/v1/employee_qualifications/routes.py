@@ -1,6 +1,8 @@
 from extensions import db
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
+
 from ..employees import Employee
 from ..qualifications import Qualification
 
@@ -14,6 +16,7 @@ employees_qualifications_bp = Blueprint('employees_qualifications', __name__)
 
 
 @employees_qualifications_bp.route('/', methods=['GET'])
+@jwt_required()
 def get_all_employee_qualifications():
 
     # employee_qualificationsテーブルとemployeesテーブルを結合して、必要な情報を取得
@@ -38,6 +41,7 @@ def get_all_employee_qualifications():
 
 
 @employees_qualifications_bp.route('/', methods=['POST'])
+@jwt_required()
 def add_employee_qualification():
     data = request.json
 
@@ -71,6 +75,7 @@ def add_employee_qualification():
 
 
 @employees_qualifications_bp.route('/<int:eq_id>', methods=['DELETE'])
+@jwt_required()
 def delete_employee_qualification(eq_id):
     emp_qualification = db.session.query(
         EmployeeQualification).filter_by(id=eq_id).first()

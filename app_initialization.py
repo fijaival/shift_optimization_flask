@@ -1,14 +1,18 @@
 from flask import Flask
 from config.config import Config
-from extensions import db
+from flask_cors import CORS
+from extensions import db, jwt
 from api.v1 import api_v1_bp
 
 
 def create_app():
     app = Flask(__name__)
+    CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
+
     app.config.from_object(Config)
 
     db.init_app(app)
+    jwt.init_app(app)
 
     @app.before_first_request
     def init():

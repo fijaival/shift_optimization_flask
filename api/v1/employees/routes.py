@@ -1,6 +1,8 @@
 from extensions import db
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
+
 from ..dependencies import EmployeeDependency
 from ..restrictions import Restriction
 from ..qualifications import Qualification
@@ -15,6 +17,7 @@ employees_bp = Blueprint('employees', __name__)
 
 
 @employees_bp.route('/', methods=["GET"])
+@jwt_required()
 def get_all_employees():
     data = Employee.query.all()
     return jsonify(employees_schema.dump(data))
@@ -23,6 +26,7 @@ def get_all_employees():
 
 
 @employees_bp.route('/<int:employee_id>', methods=['GET'])
+@jwt_required()
 def get_employee_details(employee_id):
     employee = db.session.query(Employee).filter_by(id=employee_id).first()
 
@@ -77,6 +81,7 @@ def get_employee_details(employee_id):
 
 
 @employees_bp.route('/', methods=['POST'])
+@jwt_required()
 def add_employee():
     data = request.json
     new_employee = Employee(
@@ -112,6 +117,7 @@ def add_employee():
 
 
 @employees_bp.route('/<int:employee_id>', methods=['DELETE'])
+@jwt_required()
 def delete_employee(employee_id):
 
     employee = db.session.query(Employee).filter_by(id=employee_id).first()
@@ -141,6 +147,7 @@ def delete_employee(employee_id):
 
 
 @employees_bp.route('/<int:employee_id>', methods=['PUT'])
+@jwt_required()
 def update_employee(employee_id):
     employee = db.session.query(Employee).filter_by(id=employee_id).first()
 

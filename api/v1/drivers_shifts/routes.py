@@ -1,5 +1,7 @@
 from extensions import db
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
+
 from sqlalchemy import extract
 from datetime import datetime
 from .models import DriversShift
@@ -13,6 +15,7 @@ drivers_shifts_bp = Blueprint('drivers_shifts', __name__)
 
 
 @drivers_shifts_bp.route('/<int:year>/<int:month>', methods=["GET"])
+@jwt_required()
 def get_driver_shifts_for_month(year, month):
     shifts = DriversShift.query.filter(
         extract('year', DriversShift.date) == year,
@@ -24,6 +27,7 @@ def get_driver_shifts_for_month(year, month):
 
 
 @drivers_shifts_bp.route('/', methods=['POST'])
+@jwt_required()
 def add_driver_shifts():
     shifts_data = request.json
 
@@ -52,6 +56,7 @@ def add_driver_shifts():
 
 
 @drivers_shifts_bp.route('/<int:year>/<int:month>', methods=['DELETE'])
+@jwt_required()
 def delete_driver_shift(year, month):
     shifts = DriversShift.query.filter(
         extract('year', DriversShift.date) == year,
@@ -68,6 +73,7 @@ def delete_driver_shift(year, month):
 
 # 専属ドライバーのシフトの更新
 @drivers_shifts_bp.route('/', methods=['PUT'])
+@jwt_required()
 def update_driver_shifts():
     shifts_data = request.json
     not_found_shifts = []

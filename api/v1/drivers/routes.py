@@ -1,6 +1,7 @@
 from extensions import db
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 from ..employees import employees_schema
 from .models import Driver
 from .schemas import driver_schema, drivers_schema
@@ -12,6 +13,7 @@ drivers_bp = Blueprint('drivers', __name__)
 
 
 @drivers_bp.route('/', methods=["GET"])
+@jwt_required()
 def get_all_drivers():
     data = Driver.query.all()
     return jsonify(drivers_schema.dump(data, many=True))
@@ -19,6 +21,7 @@ def get_all_drivers():
 
 
 @drivers_bp.route('/', methods=['POST'])
+@jwt_required()
 def add_driver():
     data = request.json
     errors = driver_schema.validate(data)
@@ -37,6 +40,7 @@ def add_driver():
 
 # ドライバー削除
 @drivers_bp.route('/<int:driver_id>', methods=['DELETE'])
+@jwt_required()
 def delete_driver(driver_id):
     driver = db.session.query(Driver).filter_by(id=driver_id).first()
 

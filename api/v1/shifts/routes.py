@@ -1,6 +1,8 @@
 from sqlalchemy import extract, between
 from extensions import db
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
+
 from .models import Shift
 from .schemas import shift_schema, shifts_schema
 from datetime import datetime
@@ -14,6 +16,7 @@ shifts_bp = Blueprint('shifts', __name__)
 
 
 @shifts_bp.route('/<int:year>/<int:month>', methods=["GET"])
+@jwt_required()
 def get_shifts_for_month(year, month):
 
     shifts = Shift.query.filter(
@@ -25,6 +28,7 @@ def get_shifts_for_month(year, month):
 
 # POSTリクエスト（シフトの登録）
 @shifts_bp.route('/', methods=['POST'])
+@jwt_required()
 def add_shifts():
     shifts_data = request.json
 
@@ -52,6 +56,7 @@ def add_shifts():
 
 
 @shifts_bp.route('/<int:year>/<int:month>', methods=['DELETE'])
+@jwt_required()
 def delete_shift(year, month):
     shifts = Shift.query.filter(
         extract('year', Shift.date) == year,
@@ -68,6 +73,7 @@ def delete_shift(year, month):
 
 # PUTリクエスト（シフト情報の更新）
 @shifts_bp.route('/', methods=['PUT'])
+@jwt_required()
 def update_shifts():
     shifts_data = request.json
 

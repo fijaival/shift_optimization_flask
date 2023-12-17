@@ -1,6 +1,7 @@
 from extensions import db
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 
 from .models import EmployeeDependency
 from .schemas import employee_dependency_schema
@@ -13,6 +14,7 @@ dependencies_bp = Blueprint('dependencies', __name__)
 
 
 @dependencies_bp.route('/', methods=['GET'])
+@jwt_required()
 def get_all_dependencies():
     from ..employees import Employee
 
@@ -40,6 +42,7 @@ def get_all_dependencies():
 
 
 @dependencies_bp.route('/', methods=['POST'])
+@jwt_required()
 def add_dependency():
     from ..employees import Employee
     data = request.json
@@ -74,6 +77,7 @@ def add_dependency():
 
 
 @dependencies_bp.route('/<int:dep_id>', methods=['PUT'])
+@jwt_required()
 def update_dependency(dep_id):
     from ..employees import Employee
 
@@ -111,6 +115,7 @@ def update_dependency(dep_id):
 
 
 @dependencies_bp.route('/<int:dep_id>', methods=['DELETE'])
+@jwt_required()
 def delete_dependency(dep_id):
     from ..employees import Employee
     dependency = db.session.query(
