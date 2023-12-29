@@ -1,5 +1,7 @@
 from extensions import db
-from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity, get_jwt
+from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, get_jwt_identity,
+                                get_jwt, set_access_cookies, set_refresh_cookies, unset_jwt_cookies,
+                                get_csrf_token)
 from flask import Blueprint, jsonify, request, make_response
 from datetime import datetime, timezone
 from .models import User, TokenBlocklist
@@ -57,7 +59,13 @@ def login():
     if auth_user is not None and auth_user.check_password(data['password']):
         access_token = create_access_token(identity=auth_user.username)
         refresh_token = create_refresh_token(identity=auth_user.username)
-        return make_response(jsonify(access_token=access_token, refresh_token=refresh_token), 200)
+
+        resp = jsonify({'login': True})
+        resp.headers['X-ACCESS-TOKEN-CSRF'] = get_csrf_token(access_token)
+        resp.headers['X-REFRESH-TOKEN-CSRF'] = get_csrf_token(refresh_token)
+        set_access_cookies(resp, access_token)
+        set_refresh_cookies(resp, refresh_token)
+        return resp, 200
     else:
         return make_response(jsonify({'message': 'Invalid User.'}), 401)
 
@@ -67,7 +75,11 @@ def login():
 def refresh():
     identity = get_jwt_identity()
     access_token = create_access_token(identity=identity)
-    return jsonify(access_token=access_token)
+    csrf_token = get_csrf_token(access_token)
+    resp = jsonify({'refresh': True})
+    resp.headers["X-CSRF-TOKEN"] = csrf_token
+    set_access_cookies(resp, access_token)
+    return resp, 200
 
 
 @auth_bp.route("/logout", methods=["DELETE"])
@@ -80,7 +92,9 @@ def modify_token():
     new_block_token = TokenBlocklist(jti=jti, type=ttype, created_at=now)
     db.session.add(new_block_token)
     db.session.commit()
-    return jsonify(msg=f"{ttype.capitalize()} token successfully revoked")
+    resp = jsonify({'logout': True})
+    unset_jwt_cookies(resp)
+    return resp, 200
 
 
 @jwt.token_in_blocklist_loader

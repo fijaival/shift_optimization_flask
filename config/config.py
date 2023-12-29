@@ -12,6 +12,11 @@ class Config:
     JWT_LEEWAY = 0
     JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=24)
+    JWT_TOKEN_LOCATION = ["cookies"]
+    JWT_COOKIE_SECURE = False  # In production, this should likely be True
+    JWT_ACCESS_COOKIE_PATH = '/api/v1/'
+    JWT_REFRESH_COOKIE_PATH = '/api/v1/'
+    JWT_CSRF_IN_COOKIES = False
 
     SQLALCHEMY_DATABASE_URI = 'sqlite:///order.sqlite3'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
