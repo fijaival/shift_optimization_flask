@@ -63,8 +63,12 @@ def login():
         resp = jsonify({'login': True})
         resp.headers['X-ACCESS-TOKEN-CSRF'] = get_csrf_token(access_token)
         resp.headers['X-REFRESH-TOKEN-CSRF'] = get_csrf_token(refresh_token)
-        set_access_cookies(resp, access_token)
-        set_refresh_cookies(resp, refresh_token)
+        # set_access_cookies(resp, access_token)
+        # set_refresh_cookies(resp, refresh_token)
+        resp.set_cookie('access_token_cookie', access_token,
+                        samesite='None', secure=True)
+        resp.set_cookie('refresh_token_cookie', refresh_token,
+                        samesite='None', secure=True)
         return resp, 200
     else:
         return make_response(jsonify({'message': 'Invalid User.'}), 401)

@@ -18,6 +18,9 @@ class Config:
     JWT_REFRESH_COOKIE_PATH = '/api/v1/'
     JWT_CSRF_IN_COOKIES = False
 
+    SESSION_COOKIE_SAMESITE = 'None'
+    SESSION_COOKIE_SECURE = True
+
     SQLALCHEMY_DATABASE_URI = 'sqlite:///order.sqlite3'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     JSON_AS_ASCII = False

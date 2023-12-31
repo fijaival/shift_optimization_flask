@@ -7,8 +7,10 @@ from api.v1 import api_v1_bp
 
 def create_app():
     app = Flask(__name__)
-    CORS(app, resources={r"/api/v1/*": {"origins": "*"}},
-         expose_headers=["X-Access-Token-Csrf", "X-Refresh-Token-Csrf"])
+    CORS(app, resources={r"*": {"origins": ["https://localhost:5174"]}},
+         expose_headers=["X-Access-Token-Csrf", "X-Refresh-Token-Csrf"],
+         supports_credentials=True,
+         )
 
     app.config.from_object(Config)
 
