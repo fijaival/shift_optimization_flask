@@ -7,7 +7,8 @@ from api.v1 import api_v1_bp
 
 def create_app():
     app = Flask(__name__)
-    CORS(app, resources={r"*": {"origins": ["https://localhost:5174"]}},
+    CORS(app,
+         resources={r"*": {"origins": ["https://localhost:5174/*"]}},
          expose_headers=["X-Access-Token-Csrf", "X-Refresh-Token-Csrf"],
          supports_credentials=True,
          )
@@ -22,5 +23,9 @@ def create_app():
         db.create_all()
 
     app.register_blueprint(api_v1_bp, url_prefix='/api/v1')
+
+    # csrf = CSRFProtect()
+
+    # csrf.init_app(app)
 
     return app
