@@ -10,8 +10,8 @@ class Config:
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
     JWT_ALGORITHM = 'HS256'
     JWT_LEEWAY = 0
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
-    JWT_REFRESH_TOKEN_EXPIRES = timedelta(hours=24)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(seconds=1)
+    JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=2)
     JWT_TOKEN_LOCATION = ["cookies"]
     JWT_COOKIE_SECURE = False  # In production, this should likely be True
     JWT_ACCESS_COOKIE_PATH = '/api/v1/'

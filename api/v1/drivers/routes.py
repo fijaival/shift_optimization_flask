@@ -20,7 +20,7 @@ def get_all_drivers():
 # ドライバー追加
 
 
-@drivers_bp.route('/', methods=['POST'])
+@drivers_bp.route('', methods=['POST'])
 @jwt_required()
 def add_driver():
     data = request.json

@@ -80,7 +80,9 @@ def refresh():
     csrf_token = get_csrf_token(access_token)
     resp = jsonify({'refresh': True})
     resp.headers["X-CSRF-TOKEN"] = csrf_token
-    set_access_cookies(resp, access_token)
+    resp.set_cookie('access_token_cookie', '', expires=datetime(1970, 1, 1))
+    resp.set_cookie('access_token_cookie', access_token,
+                    samesite='None', secure=True)
     return resp, 200
 
 
