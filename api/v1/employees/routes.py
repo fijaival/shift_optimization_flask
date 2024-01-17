@@ -19,8 +19,56 @@ employees_bp = Blueprint('employees', __name__)
 @employees_bp.route('/', methods=["GET"])
 @jwt_required()
 def get_all_employees():
-    data = Employee.query.all()
-    return jsonify(employees_schema.dump(data))
+    employees = Employee.query.all()
+    all_employees_data = []
+
+    for employee in employees:
+        # 従業員の基本情報
+        employee_data = {
+            "id": employee.id,
+            "last_name": employee.last_name,
+            "first_name": employee.first_name,
+            "qualifications": [],
+            "restrictions": [],
+            "dependencies": []
+        }
+
+        # 資格情報の取得
+        for eq in employee.qualifications:
+            qualification = db.session.query(Qualification).filter_by(
+                id=eq.qualification_id).first()
+            if qualification:
+                employee_data["qualifications"].append({
+                    "id": qualification.id,
+                    "name": qualification.name
+                })
+
+        # 制限情報の取得
+        for er in employee.restrictions:
+            restriction = db.session.query(Restriction).filter_by(
+                id=er.restriction_id).first()
+            if restriction:
+                employee_data["restrictions"].append({
+                    "id": restriction.id,
+                    "name": restriction.name,
+                    "value": er.value
+                })
+
+        # 依存関係の取得
+        for dep in employee.dependencies:
+            required_employee = db.session.query(Employee).filter_by(
+                id=dep.required_employee_id).first()
+            if required_employee:
+                employee_data["dependencies"].append({
+                    "id": required_employee.id,
+                    "last_name": required_employee.last_name,
+                    "first_name": required_employee.first_name
+                })
+
+        all_employees_data.append(employee_data)
+
+    return jsonify(all_employees_data)
+
 
 # GET(１件取得)
 
@@ -80,7 +128,7 @@ def get_employee_details(employee_id):
 # 従業員情報の追加
 
 
-@employees_bp.route('/', methods=['POST'])
+@employees_bp.route('', methods=['POST'])
 @jwt_required()
 def add_employee():
     data = request.json
