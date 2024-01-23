@@ -139,22 +139,37 @@ def add_employee():
 
     # 資格の情報を追加
     if 'qualifications' in data:
-        for q_id in data['qualifications']:
-            emp_qualification = EmployeeQualification(qualification_id=q_id)
-            new_employee.qualifications.append(emp_qualification)
+        for qual in data['qualifications']:
+            emp_qualification = EmployeeQualification(
+                qualification_id=qual['id'])
+            tmp = db.session.query(Qualification).filter_by(
+                id=qual['id']).first()
+            if tmp.name == qual['name']:
+                new_employee.qualifications.append(emp_qualification)
+            else:
+                return jsonify({"message": "no match qualificationId and qualificationName", "id": ""}), 301
 
     # 制限の情報を追加
     if 'restrictions' in data:
         for r in data['restrictions']:
             emp_restriction = EmployeeRestriction(
                 restriction_id=r['id'], value=r['value'])
-            new_employee.restrictions.append(emp_restriction)
+            tmp = db.session.query(Restriction).filter_by(
+                id=r['id']).first()
+            if tmp.name == r['name']:
+                new_employee.restrictions.append(emp_restriction)
+            else:
+                return jsonify({"message": "no match restrictionId and restrictionName", "id": ""}), 301
 
     # 依存関係の情報を追加
     if 'dependencies' in data:
-        for d_id in data['dependencies']:
-            dependency = EmployeeDependency(required_employee_id=d_id)
-            new_employee.dependencies.append(dependency)
+        for dep in data['dependencies']:
+            # 以下の処理は、idが名前と一致しているかの確認に変える
+            if (dep['first_name'] is not "") & (dep['last_name'] is not ""):
+                dependency = EmployeeDependency(required_employee_id=dep['id'])
+                new_employee.dependencies.append(dependency)
+            else:
+                return jsonify({"message": "No name", "id": ""}), 301
 
     db.session.add(new_employee)
     db.session.commit()

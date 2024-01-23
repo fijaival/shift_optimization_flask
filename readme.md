@@ -45,9 +45,9 @@ POST /employees
     "last_name": "中田",
     "first_name": "正弘",
     "qualifications":[5],
-    "restrictions":[
+    "restrictions":[{"id":1,"value":3}
     ],
-    "dependencies":[]
+    "dependencies":[6]
 }
 ```
 
