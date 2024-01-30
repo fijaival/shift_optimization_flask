@@ -40,7 +40,7 @@ def get_all_employee_qualifications():
 # 特定の従業員の資格情報追加（すでにある資格情報を追加できないようにフロント実装すべし）
 
 
-@employees_qualifications_bp.route('/', methods=['POST'])
+@employees_qualifications_bp.route('', methods=['POST'])
 @jwt_required()
 def add_employee_qualification():
     data = request.json

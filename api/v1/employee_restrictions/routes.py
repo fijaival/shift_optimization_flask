@@ -40,7 +40,7 @@ def get_all_employee_restrictions():
 # 特定の従業員の制限情報追加 （すでにある制限情報を追加でいないようにフロント実装すべし）
 
 
-@employees_restrictions_bp.route('/', methods=['POST'])
+@employees_restrictions_bp.route('', methods=['POST'])
 @jwt_required()
 def add_employee_restriction():
     data = request.json
@@ -102,13 +102,12 @@ def update_employee_restriction(er_id):
         return jsonify({"message": "Employee restriction not found"}), 404
 
     data = request.json
-    errors = employee_restriction_schema.validate(data)
-    if errors:
-        return jsonify({"errors": errors}), 400
 
     # 制限情報の更新
     if 'value' in data:
         emp_restriction.value = data['value']
+    else:
+        return jsonify({"errors": "value is required"}), 400
 
     db.session.commit()
 

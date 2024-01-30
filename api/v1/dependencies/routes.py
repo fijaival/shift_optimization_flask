@@ -41,7 +41,7 @@ def get_all_dependencies():
 # 依存関係の追加
 
 
-@dependencies_bp.route('/', methods=['POST'])
+@dependencies_bp.route('', methods=['POST'])
 @jwt_required()
 def add_dependency():
     from ..employees import Employee

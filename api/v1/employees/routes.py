@@ -35,12 +35,14 @@ def get_all_employees():
 
         # 資格情報の取得
         for eq in employee.qualifications:
+
             qualification = db.session.query(Qualification).filter_by(
                 id=eq.qualification_id).first()
             if qualification:
                 employee_data["qualifications"].append({
-                    "id": qualification.id,
-                    "name": qualification.name
+                    "qualification_id": qualification.id,
+                    "name": qualification.name,
+                    "id": eq.id
                 })
 
         # 制限情報の取得
@@ -49,9 +51,10 @@ def get_all_employees():
                 id=er.restriction_id).first()
             if restriction:
                 employee_data["restrictions"].append({
-                    "id": restriction.id,
+                    "restriction_id": restriction.id,
                     "name": restriction.name,
-                    "value": er.value
+                    "value": er.value,
+                    "id": er.id
                 })
 
         # 依存関係の取得
@@ -60,9 +63,10 @@ def get_all_employees():
                 id=dep.required_employee_id).first()
             if required_employee:
                 employee_data["dependencies"].append({
-                    "id": required_employee.id,
+                    "required_employee_id": required_employee.id,
                     "last_name": required_employee.last_name,
-                    "first_name": required_employee.first_name
+                    "first_name": required_employee.first_name,
+                    "id": dep.id
                 })
 
         all_employees_data.append(employee_data)
@@ -141,9 +145,9 @@ def add_employee():
     if 'qualifications' in data:
         for qual in data['qualifications']:
             emp_qualification = EmployeeQualification(
-                qualification_id=qual['id'])
+                qualification_id=qual['qualification_id'])
             tmp = db.session.query(Qualification).filter_by(
-                id=qual['id']).first()
+                id=qual['qualification_id']).first()
             if tmp.name == qual['name']:
                 new_employee.qualifications.append(emp_qualification)
             else:
@@ -153,9 +157,9 @@ def add_employee():
     if 'restrictions' in data:
         for r in data['restrictions']:
             emp_restriction = EmployeeRestriction(
-                restriction_id=r['id'], value=r['value'])
+                restriction_id=r['restriction_id'], value=r['value'])
             tmp = db.session.query(Restriction).filter_by(
-                id=r['id']).first()
+                id=r['restriction_id']).first()
             if tmp.name == r['name']:
                 new_employee.restrictions.append(emp_restriction)
             else:
@@ -166,10 +170,11 @@ def add_employee():
         for dep in data['dependencies']:
             # 以下の処理は、idが名前と一致しているかの確認に変える
             if (dep['first_name'] is not "") & (dep['last_name'] is not ""):
-                dependency = EmployeeDependency(required_employee_id=dep['id'])
+                dependency = EmployeeDependency(
+                    required_employee_id=dep['required_employee_id'])
                 new_employee.dependencies.append(dependency)
             else:
-                return jsonify({"message": "No name", "id": ""}), 301
+                return jsonify({"message": "No name", "required_employee_id": ""}), 301
 
     db.session.add(new_employee)
     db.session.commit()

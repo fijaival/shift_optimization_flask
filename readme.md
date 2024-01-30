@@ -57,7 +57,8 @@ POST /employees_restrictions
 {
     "employee_id":1,
     "restriction_id":"1",
-    "value":4
+    "value":4,
+    "name":"夜勤の連続回数"
 }
 ```
 
@@ -66,7 +67,8 @@ POST /employees_qualifications
 ```
 {
     "employee_id":1,
-    "qualification_id":1
+    "qualification_id":1,
+    "name":"全部休み"
 }
 ```
 
@@ -74,8 +76,10 @@ POST /dependencies
 
 ```
 {
-    "dependent_employee_id":6,
-    "required_employee_id":12
+"dependent_employee_id":1,
+"first_name": "茉奈",
+"last_name": "平良",
+"required_employee_id": 3
 }
 ```
 
