@@ -2,7 +2,6 @@ from extensions import db
 
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
-from ..employees import employees_schema
 from .models import Driver
 from .schemas import driver_schema, drivers_schema
 
@@ -51,3 +50,26 @@ def delete_driver(driver_id):
     db.session.commit()
 
     return jsonify({"message": "driver deleted successfully!"}), 200
+
+# ドライバー更新
+
+
+@drivers_bp.route('/<int:driver_id>', methods=['PUT'])
+@jwt_required()
+def update_driver(driver_id):
+    driver = db.session.query(Driver).filter_by(id=driver_id).first()
+
+    if not driver:
+        return jsonify({"message": "driver not found"}), 404
+
+    data = request.json
+    errors = driver_schema.validate(data)
+    if errors:
+        return jsonify({"errors": errors}), 400
+
+    driver.last_name = data['last_name']
+    driver.first_name = data['first_name']
+
+    db.session.commit()
+
+    return jsonify({"message": "driver updated successfully!"}), 200
