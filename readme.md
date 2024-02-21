@@ -119,7 +119,7 @@ flask run
 
   - GET: 全授業院のすべての情報を取得
   - POST: 授業院の追加
-  - '/<int:employee_id>'
+  - `/<int:employee_id>`
     - GET: 特定の従業員の情報を取得
     - DELETE: 従業員の削除
     - PUT: 特定の従業員情報の更新
@@ -128,14 +128,14 @@ flask run
 
   - GET: 全資格名の取得
   - POST: 資格の追加
-  - '/<int:qual_id>'
+  - `/<int:qual_id>`
     - DELETE: 資格の削除
 
 - `/restrictions`
 
   - GET: 全制約条件名の取得
   - POST: 制約条件の追加
-  - '/<int:res_id>'
+  - `/<int:res_id>`
     - DELETE: 制約条件の削除
 
 - `/shift_generation/<int:year>/<int:month>`
@@ -146,15 +146,15 @@ flask run
 
   - POST: 作成したシフトの登録
   - PUT: 勤務情報の更新
-  - '/<int:year>/<int:month>'
+  - `/<int:year>/<int:month>`
     - GET: 特定の年月のシフトを一か月分取得
     - DELETE: 特定の年月の勤務情報をまとめて削除
 
 - `/shifts_requests`
   - POST: シフト希望の登録
-  - '/<int:year>/<int:month>'
+  - `/<int:year>/<int:month>`
     - GET: 特定の年月のシフト希望を一か月分取得
-  - '/<int:request_id>'
+  - `/<int:request_id>`
     - DELETE: 特定の年月の勤務情報をまとめて削除
 
 ## 依存関係
