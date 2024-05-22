@@ -4,3 +4,6 @@
 .venv/
 
 .env
+
+instance
+**/order.sqlite3
