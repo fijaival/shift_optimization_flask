@@ -8,9 +8,7 @@ from api.v1 import api_v1_bp
 def create_app():
     app = Flask(__name__)
     CORS(app,
-         resources={r"/*": {"origins": ["https://localhost:8001/*"]}},
-         expose_headers=["X-Access-Token-Csrf",
-                         "X-Refresh-Token-Csrf", "X-Csrf-Token"],
+         resources={r"/*": {"origins": ["http://localhost:8000/*"]}},
          supports_credentials=True,
          )
 

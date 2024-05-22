@@ -1,8 +1,8 @@
 from extensions import db
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, get_jwt_identity,
                                 get_jwt, set_access_cookies, set_refresh_cookies, unset_jwt_cookies,
-                                get_csrf_token)
-from flask import Blueprint, jsonify, request, make_response
+                                )
+from flask import Blueprint, jsonify, request, make_response, current_app
 from datetime import datetime, timezone
 from .models import User, TokenBlocklist
 from .schemas import user_schema, users_schema
@@ -19,7 +19,7 @@ def get_all_users():
     return jsonify(users_schema.dump(data, many=True))
 
 
-@auth_bp.route('/signin', methods=['POST'])
+@auth_bp.route('/signup', methods=['POST'])
 def signin():
     data = request.json
     errors = user_schema.validate(data)
@@ -59,14 +59,9 @@ def login():
     if auth_user is not None and auth_user.check_password(data['password']):
         access_token = create_access_token(identity=auth_user.username)
         refresh_token = create_refresh_token(identity=auth_user.username)
-
         resp = jsonify({'login': True})
-        resp.headers['X-ACCESS-TOKEN-CSRF'] = get_csrf_token(access_token)
-        resp.headers['X-REFRESH-TOKEN-CSRF'] = get_csrf_token(refresh_token)
-        resp.set_cookie('access_token_cookie', access_token,
-                        samesite='None', secure=True)
-        resp.set_cookie('refresh_token_cookie', refresh_token,
-                        samesite='None', secure=True)
+        set_access_cookies(resp, access_token)
+        set_refresh_cookies(resp, refresh_token)
         return resp, 200
     else:
         return make_response(jsonify({'message': 'Invalid User.'}), 401)
@@ -77,9 +72,7 @@ def login():
 def refresh():
     identity = get_jwt_identity()
     access_token = create_access_token(identity=identity)
-    csrf_token = get_csrf_token(access_token)
     resp = jsonify({'refresh': True})
-    resp.headers["X-CSRF-TOKEN"] = csrf_token
     resp.set_cookie('access_token_cookie', '', expires=datetime(1970, 1, 1))
     resp.set_cookie('access_token_cookie', access_token,
                     samesite='None', secure=True)
