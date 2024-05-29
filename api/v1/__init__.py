@@ -11,7 +11,7 @@ from .drivers_requests import drivers_requests_bp
 from .shifts import shifts_bp
 from .drivers_shifts import drivers_shifts_bp
 from .shift_generation import shift_generation_bp
-from .auth import auth_bp
+from .routes import auth_bp
 
 api_v1_bp = Blueprint('api_v1', __name__)
 
