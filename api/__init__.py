@@ -1,8 +1,9 @@
 from flask import Flask
-from config.config import Config
+from config import Config
 from flask_cors import CORS
 from extensions import db, jwt
 from api.v1 import api_v1_bp
+from flask_migrate import Migrate
 
 
 def create_app():
@@ -21,5 +22,11 @@ def create_app():
     def init():
         db.create_all()
 
+    # migration
+    migrate = Migrate(app, db)
+
     app.register_blueprint(api_v1_bp, url_prefix='/api/v1')
+
+    print(app.config['SQLALCHEMY_DATABASE_URI'])
+
     return app
