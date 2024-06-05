@@ -1,4 +1,4 @@
-from app_initialization import create_app
+from api import create_app
 import ssl
 
 
