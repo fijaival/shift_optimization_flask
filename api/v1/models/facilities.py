@@ -5,8 +5,8 @@ from sqlalchemy.orm import relationship
 
 from .employees import Employee
 from .auth import User
-from .constraints import Constraint
-from .qualifications import Qualification
+from .constraints import Constraint, ConstraintSchema
+from .qualifications import Qualification, QualificationSchema
 
 facility_constraints = db.Table(
     "facility_constraints",
@@ -39,3 +39,5 @@ class Facility(db.Model):
 class FacilitySchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Facility
+    qualifications = fields.Nested(QualificationSchema, many=True)
+    constraints = fields.Nested(ConstraintSchema, many=True)

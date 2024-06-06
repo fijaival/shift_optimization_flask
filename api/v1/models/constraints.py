@@ -1,9 +1,8 @@
-from extensions import db
+from extensions import db, ma
 from datetime import datetime
 
 
 from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.orm import relationship
 
 
 class Constraint(db.Model):
@@ -15,7 +14,7 @@ class Constraint(db.Model):
     updated_at = Column(DateTime, nullable=False,
                         default=datetime.now, onupdate=datetime.now)
 
-    employee_constraints = relationship(
-        "EmployeeConstraint", back_populates="constraint", cascade='all, delete-orphan')
-    facility_constraints = relationship(
-        "FacilityConstraint", back_populates="constraint", cascade='all, delete-orphan')
+
+class ConstraintSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Constraint

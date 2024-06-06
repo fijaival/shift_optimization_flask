@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from ..models import User, UserSchema, TokenBlocklist
 # from ..schemas import user_schema, users_schema
 from ..validators import post_user_schema, login_user_schema
-from ..error import InvalidAPIUsage
+from api.error import InvalidAPIUsage
 
 
 auth_bp = Blueprint("auth", __name__)

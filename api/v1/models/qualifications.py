@@ -1,4 +1,4 @@
-from extensions import db
+from extensions import db, ma
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime
@@ -14,7 +14,7 @@ class Qualification(db.Model):
     updated_at = Column(DateTime, nullable=False,
                         default=datetime.now, onupdate=datetime.now)
 
-    employee_qualifications = relationship(
-        "EmployeeQualification", back_populates="qualification", cascade='all, delete-orphan')
-    facility_qualifications = relationship(
-        "FacilityQualification", back_populates="qualification", cascade='all, delete-orphan')
+
+class QualificationSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Qualification
