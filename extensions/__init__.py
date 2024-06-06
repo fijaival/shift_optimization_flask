@@ -1,4 +1,3 @@
 
-from .db import db
+from .db import db, ma, fields
 from .auth import jwt
-from .ma import ma

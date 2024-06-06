@@ -1,70 +1,55 @@
 from extensions import db
+
+
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, get_jwt_identity,
                                 get_jwt, set_access_cookies, set_refresh_cookies, unset_jwt_cookies,
                                 )
-from flask import Blueprint, jsonify, request, make_response, current_app
+from flask import Blueprint, jsonify, request
 from datetime import datetime, timezone
-from ..models import User, TokenBlocklist
-from ..schemas import user_schema, users_schema
-from extensions import jwt
+from ..models import User, UserSchema, TokenBlocklist
+# from ..schemas import user_schema, users_schema
+from ..validators import post_user_schema, login_user_schema
+from ..error import InvalidAPIUsage
 
 
 auth_bp = Blueprint("auth", __name__)
 
 
-@auth_bp.route('/users', methods=["GET"])
-def get_all_users():
-    data = User.query.all()
-    # この処理はテストのため処理が中途半端
-    return jsonify(users_schema.dump(data, many=True))
-
-
 @auth_bp.route('/signup', methods=['POST'])
 def signin():
-    data = request.json
-    errors = user_schema.validate(data)
+    input_data = request.json
+    errors = post_user_schema.validate(input_data)
     if errors:
-        return jsonify({"errors": errors}), 400
-    username = data['username']
-    password = data['password']
-    if password is None or username is None or password == "" or username == "":
-        return jsonify({"msg": "password or username has not been entered"}), 400
-    if len(password) < 4:
-        return jsonify({"msg": "password is too short"}), 400
-    if len(username) < 3:
-        return jsonify({"msg": "username is too short"}), 400
-    if User.query.filter_by(username=username).first() is not None:
-        return jsonify({"msg": "The username is already in use"}), 409
-    new_user = User(
-        username=username,
-    )
+        raise InvalidAPIUsage(errors)
 
-    new_user.set_password(password)
-
+    user = User.query.filter_by(username=input_data["username"]).first()
+    if user:
+        raise InvalidAPIUsage("User already exists")
+    new_user = User(**input_data)
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({"message": "user added successfully!", "id": new_user.id}), 201
+    res = UserSchema().dump(new_user)
+    return res, 201
 
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.json
-    errors = user_schema.validate(data)
+    errors = login_user_schema.validate(data)
     if errors:
-        return jsonify({"errors": errors}), 400
-
+        raise InvalidAPIUsage(errors)
     auth_user = User.query.filter_by(username=data['username']).first()
 
     if auth_user is not None and auth_user.check_password(data['password']):
-        access_token = create_access_token(identity=auth_user.username)
-        refresh_token = create_refresh_token(identity=auth_user.username)
+        access_token = create_access_token(identity=auth_user.user_id)
+        refresh_token = create_refresh_token(identity=auth_user.user_id)
         resp = jsonify({'login': True})
         set_access_cookies(resp, access_token)
         set_refresh_cookies(resp, refresh_token)
         return resp, 200
     else:
-        return make_response(jsonify({'message': 'Invalid User.'}), 401)
+        raise InvalidAPIUsage('Invalid User.', 401)
 
 
 @auth_bp.route("/refresh", methods=["POST"])
@@ -92,10 +77,3 @@ def modify_token():
     resp = jsonify({'logout': True})
     unset_jwt_cookies(resp)
     return resp, 200
-
-
-@jwt.token_in_blocklist_loader
-def token_block(_jwt_header, jwt_data):
-    if TokenBlocklist.query.filter_by(jti=jwt_data["jti"]).first():
-        return True
-    return False

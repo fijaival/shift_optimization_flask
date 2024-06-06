@@ -1,12 +1,20 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import event
-from sqlalchemy.engine import Engine
+from flask_marshmallow import Marshmallow, fields
+from sqlalchemy.dialects.mysql import TINYINT, VARBINARY
+from sqlalchemy.orm import DeclarativeBase
 
-db = SQLAlchemy()
+
+class Base(DeclarativeBase):
+    pass
 
 
-@event.listens_for(Engine, "connect")
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute("PRAGMA foreign_keys = ON")
-    cursor.close()
+db = SQLAlchemy(model_class=Base)
+
+
+ma = Marshmallow()
+
+
+fields = fields.fields
+
+db.Tinyint = TINYINT
+db.Varbinary = VARBINARY
