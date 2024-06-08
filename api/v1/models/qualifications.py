@@ -1,18 +1,18 @@
 from extensions import db, ma
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, String, DateTime
-from sqlalchemy.orm import relationship
+from sqlalchemy import String
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 
 class Qualification(db.Model):
     __tablename__ = 'qualifications'
 
-    qualification_id = Column(Integer, primary_key=True)
-    name = Column(String(255))
-    created_at = Column(DateTime, nullable=False, default=datetime.now)
-    updated_at = Column(DateTime, nullable=False,
-                        default=datetime.now, onupdate=datetime.now)
+    qualification_id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(255))
+    created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now)
+    updated_at: Mapped[datetime] = mapped_column(nullable=False,
+                                                 default=datetime.now, onupdate=datetime.now)
 
 
 class QualificationSchema(ma.SQLAlchemyAutoSchema):
