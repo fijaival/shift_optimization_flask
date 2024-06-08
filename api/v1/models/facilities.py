@@ -1,7 +1,7 @@
 from datetime import datetime
 from extensions import db, ma, fields
 from sqlalchemy import Column, String, ForeignKey
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
 
 from .employees import Employee
 from .auth import User
@@ -10,8 +10,8 @@ from .qualifications import Qualification, QualificationSchema
 
 facility_constraints = db.Table(
     "facility_constraints",
-    Column('facility_id', ForeignKey('facilities.facility_id')),
-    Column('constraint_id', ForeignKey('constraints.constraint_id'))
+    Column('facility_id', ForeignKey('facilities.facility_id', ondelete='CASCADE')),
+    Column('constraint_id', ForeignKey('constraints.constraint_id', ondelete='CASCADE'))
 )
 facility_qualifications = db.Table(
     "facility_qualifications",
@@ -30,9 +30,10 @@ class Facility(db.Model):
     users: Mapped[list["User"]] = relationship(backref='facility')
 
     # Many to Many
-    constraints: Mapped[list[Constraint]] = relationship(secondary=facility_constraints, backref="facilities")
+    constraints: Mapped[list[Constraint]] = relationship(
+        secondary=facility_constraints, backref=backref("facilities", passive_deletes=True))
     qualifications: Mapped[list[Qualification]] = relationship(
-        'Qualification', secondary=facility_qualifications, backref="facilities")
+        secondary=facility_qualifications, backref=backref("facilities", passive_deletes=True))
 
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now, onupdate=datetime.now)

@@ -2,7 +2,7 @@ from extensions import db
 from datetime import datetime
 
 from sqlalchemy import Integer, String,  ForeignKey, DateTime, Column
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
 
 from .constraints import Constraint
 from .qualifications import Qualification
@@ -15,8 +15,8 @@ from .employee_constraints import EmployeeConstraint
 
 employee_qualifications = db.Table(
     "employee_qualifications",
-    Column('employee_id', ForeignKey('employees.employee_id')),
-    Column('qualification_id', ForeignKey('qualifications.qualification_id'))
+    Column('employee_id', ForeignKey('employees.employee_id', ondelete="CASCADE")),
+    Column('qualification_id', ForeignKey('qualifications.qualification_id', ondelete="CASCADE"))
 )
 
 
@@ -24,7 +24,8 @@ class Employee(db.Model):
     __tablename__ = 'employees'
 
     employee_id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    facility_id: Mapped[int] = mapped_column(Integer, ForeignKey('facilities.facility_id'), nullable=False)
+    facility_id: Mapped[int] = mapped_column(Integer, ForeignKey(
+        'facilities.facility_id', ondelete='RESTRICT'), nullable=False)
     first_name: Mapped[str] = mapped_column(String(100), nullable=False)
     last_name: Mapped[str] = mapped_column(String(100), nullable=False)
     employee_type_id: Mapped[int] = mapped_column(
@@ -42,10 +43,11 @@ class Employee(db.Model):
     employee_type: Mapped["EmployeeType"] = relationship(backref='employees')
 
     # Many to Many
-    qualifications: Mapped[list[Qualification]] = relationship(secondary=employee_qualifications, backref='employees')
+    qualifications: Mapped[list[Qualification]] = relationship(
+        secondary=employee_qualifications, backref=backref('employees', passive_deletes=True))
     # many-to-many relationship to Constraint, bypassing the `EmployeeConstraint` class
     constraints: Mapped[list["Constraint"]] = relationship(
-        secondary="employee_constraints", backref='employees', viewonly=True)
+        secondary="employee_constraints", backref=backref('employees', passive_deletes=True), viewonly=True)
     # association between Employee -> EmployeeConstraint -> Constraint
     employee_constraints: Mapped[list["EmployeeConstraint"]] = relationship(backref='employees')
 

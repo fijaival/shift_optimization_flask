@@ -9,7 +9,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 class User(db.Model):
     __tablename__ = 'users'
     user_id: Mapped[int] = mapped_column(primary_key=True)
-    facility_id: Mapped[int] = mapped_column(ForeignKey('facilities.facility_id'), nullable=False)
+    facility_id: Mapped[int] = mapped_column(ForeignKey('facilities.facility_id', ondelete='RESTRICT'), nullable=False)
     username: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     is_admin: Mapped[bool] = mapped_column(nullable=False, default=False)

@@ -10,8 +10,10 @@ class EmployeeConstraint(db.Model):
     __tablename__ = 'employee_constraints'
 
     employee_constraint_id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    employee_id: Mapped[int] = mapped_column(Integer, ForeignKey('employees.employee_id'), nullable=False)
-    constraint_id: Mapped[int] = mapped_column(Integer, ForeignKey('constraints.constraint_id'), nullable=False)
+    employee_id: Mapped[int] = mapped_column(Integer, ForeignKey(
+        'employees.employee_id', ondelete="CASCADE"), nullable=False)
+    constraint_id: Mapped[int] = mapped_column(Integer, ForeignKey(
+        'constraints.constraint_id', ondelete="CASCADE"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now, onupdate=datetime.now)
 
