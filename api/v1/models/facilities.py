@@ -1,7 +1,7 @@
 from datetime import datetime
 from extensions import db, ma, fields
-from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 from .employees import Employee
 from .auth import User
@@ -22,18 +22,20 @@ facility_qualifications = db.Table(
 
 class Facility(db.Model):
     __tablename__ = 'facilities'
-    facility_id = Column(Integer, primary_key=True)
-    facility_name = Column(String(191), nullable=False)
-    employees = relationship('Employee', backref='facility')
-    users = relationship('User', backref='facility')
-    constraints = relationship(
-        'Constraint', secondary=facility_constraints, backref="facilities")
-    qualifications = relationship(
+    facility_id: Mapped[int] = mapped_column(primary_key=True)
+    facility_name: Mapped[str] = mapped_column(String(191), nullable=False)
+
+    # One to Many
+    employees: Mapped[list["Employee"]] = relationship(backref='facility')
+    users: Mapped[list["User"]] = relationship(backref='facility')
+
+    # Many to Many
+    constraints: Mapped[list[Constraint]] = relationship(secondary=facility_constraints, backref="facilities")
+    qualifications: Mapped[list[Qualification]] = relationship(
         'Qualification', secondary=facility_qualifications, backref="facilities")
 
-    created_at = Column(DateTime, nullable=False, default=datetime.now)
-    updated_at = Column(DateTime, nullable=False,
-                        default=datetime.now, onupdate=datetime.now)
+    created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now)
+    updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now, onupdate=datetime.now)
 
 
 class FacilitySchema(ma.SQLAlchemyAutoSchema):
