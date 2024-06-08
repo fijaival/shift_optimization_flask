@@ -1,22 +1,24 @@
-from api.v1.models import User, TokenBlocklist
-from api.v1.error import InvalidAPIUsage
-from functools import wraps  # デコレータ作成用
+from flask import abort, jsonify
+
+
 from flask_jwt_extended import (
-    JWTManager, verify_jwt_in_request, get_jwt,
+    JWTManager, verify_jwt_in_request, get_jwt, jwt_required
 )
-from flask_jwt_extended import JWTManager
-jwt = JWTManager()
+from functools import wraps  # デコレータ作成用
 
 '''以下で、JWTの挙動をデフォルトから変更する(エラーのフォーマットを変えるなど)'''
 # アクセストークンに、権限情報も含めるようにする
+jwt = JWTManager()
 
 
 @jwt.additional_claims_loader
 def add_claims_to_access_token(identity):
+    from api.v1.models import User
     user = User.query.filter_by(user_id=identity).first()
     return {
         'user_id': identity,
-        'is_admin': user.is_admin
+        'is_admin': user.is_admin,
+        'facility_id': user.facility_id
     }
 
 # トークンの有効期限切れ時の挙動
@@ -26,33 +28,69 @@ def add_claims_to_access_token(identity):
 def my_expired_token_callback(jwt_header, jwt_payload):
     token_type = jwt_payload['type']
     if token_type == 'access':
-        raise InvalidAPIUsage("Access token has expired", 401)
+        message = "access token has expired"
     else:
-        raise InvalidAPIUsage("Refresh token has expired", 401)
+        message = "refresh token has expired"
+    response = jsonify({
+        "message": message,
+        "error": "token_expired"
+    })
+    response.status_code = 401
+    return response
 
 # 無効な形式のトークン時の挙動
 
 
 @jwt.invalid_token_loader
 def my_invalid_token_callback(error_string):
-    raise InvalidAPIUsage(error_string, 401)
+    response = jsonify({
+        "message": error_string,
+        "error": "invalid_token"
+    })
+    response.status_code = 401
+    return response
 
 # 認証エラー時の挙動
 
 
 @jwt.unauthorized_loader
-def my_unauthorized_callback(error_string):
-    raise InvalidAPIUsage(error_string, 401)
+def custom_unauthorized_response(error_string):
+    response = jsonify({
+        "message": error_string,
+        "error": "unauthorized"
+    })
+    response.status_code = 401
+    return response
 
 
 @jwt.token_in_blocklist_loader
 def token_block(jwt_header, jwt_payload):
+    from api.v1.models import TokenBlocklist
     if TokenBlocklist.query.filter_by(jti=jwt_payload["jti"]).first():
         return True
     return False
 
 
 '''アクセス制限用にデコレータを作成する'''
+# 自分の施設のみアクセスできるエンドポイント
+
+
+def self_facility_required(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        verify_jwt_in_request()  # 通常のトークン認証
+        claims = get_jwt()
+        if claims['facility_id'] != kwargs['facility_id']:  # カスタマイズした権限情報の確認
+            response = jsonify({
+                "message": "Unauthorized",
+                "error": "unauthorized"
+            })
+            response.status_code = 401
+            return response
+        else:
+            return fn(*args, **kwargs)
+    return wrapper
+
 # 管理者のみアクセスできるエンドポイント
 
 
@@ -62,7 +100,12 @@ def admin_required(fn):
         verify_jwt_in_request()  # 通常のトークン認証
         claims = get_jwt()
         if claims['is_admin'] != 1:  # カスタマイズした権限情報の確認
-            raise InvalidAPIUsage("Admins only", 403)
+            response = jsonify({
+                "message": "Admins only",
+                "error": "unauthorized"
+            })
+            response.status_code = 403
+            return response
         else:
             return fn(*args, **kwargs)
     return wrapper

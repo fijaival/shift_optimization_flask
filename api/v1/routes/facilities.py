@@ -1,8 +1,9 @@
-from extensions import db
 from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
-from ..validators import post_facility_schema, post_qualification_schema, post_constraint_schema
 
+from extensions import db, jwt_required, self_facility_required
+# from extensions.auth import jwt_required, self_facility_required
+
+from ..validators import post_facility_schema, post_qualification_schema, post_constraint_schema
 from ..models import Facility, FacilitySchema, Qualification, Constraint
 from api.error import InvalidAPIUsage
 
@@ -31,7 +32,7 @@ def add_facility():
 
 
 @facilities_bp.route('/<int:facility_id>', methods=['GET'])
-@jwt_required()
+@self_facility_required
 def get_facility(facility_id):
     facility = db.session.query(Facility).filter_by(
         facility_id=facility_id).first()
@@ -44,9 +45,8 @@ def get_facility(facility_id):
 
 
 @facilities_bp.route('/<int:facility_id>/qualifications', methods=['POST'])
-@jwt_required()
+@self_facility_required
 def add_qualification_to_facility(facility_id):
-    """自分のところしか変えられないようにすべし。jwtにfacilityidもたせて、パラメータと一致するかを確認するとか"""
     data = request.json
     error = post_qualification_schema.validate(data)
     if error:
@@ -67,6 +67,34 @@ def add_qualification_to_facility(facility_id):
             "The facility already has its qualification", 400)
 
     facility.qualifications.append(qualification)
+    db.session.commit()
+    res = FacilitySchema().dump(facility)
+    return res, 201
+
+
+@facilities_bp.route('/<int:facility_id>/constraints', methods=['POST'])
+@self_facility_required
+def add_constraint_to_facility(facility_id):
+    data = request.json
+    error = post_constraint_schema.validate(data)
+    if error:
+        raise InvalidAPIUsage(error)
+
+    constraint = Constraint.query.filter_by(name=data['name']).first()
+    if not constraint:
+        constraint = Constraint(**data)
+        db.session.add(constraint)
+        db.session.commit()
+
+    facility = Facility.query.filter_by(facility_id=facility_id).first()
+    if not facility:
+        raise InvalidAPIUsage("Facility not found", 404)
+
+    if any(q.name == data['name'] for q in facility.constraints):
+        raise InvalidAPIUsage(
+            "The facility already has its constraint", 400)
+
+    facility.constraints.append(constraint)
     db.session.commit()
     res = FacilitySchema().dump(facility)
     return res, 201
