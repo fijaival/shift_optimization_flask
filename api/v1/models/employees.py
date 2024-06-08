@@ -29,15 +29,17 @@ class Employee(db.Model):
     first_name: Mapped[str] = mapped_column(String(100), nullable=False)
     last_name: Mapped[str] = mapped_column(String(100), nullable=False)
     employee_type_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey('employee_types.employee_type_id'), nullable=False)
+        Integer, ForeignKey('employee_types.employee_type_id', ondelete='RESTRICT'), nullable=False)
 
     # One to Many
-    day_off_requests: Mapped[list["DayOffRequest"]] = relationship(backref='employee', cascade="all, delete-orphan")
-    shifts: Mapped[list["Shift"]] = relationship(backref='employee', cascade="all, delete-orphan")
+    day_off_requests: Mapped[list["DayOffRequest"]] = relationship(
+        backref='employee', cascade="all, delete-orphan", passive_deletes=True,)
+    shifts: Mapped[list["Shift"]] = relationship(
+        backref='employee', cascade="all, delete-orphan", passive_deletes=True,)
     dependencies: Mapped[list["Dependency"]] = relationship(
-        foreign_keys='Dependency.employee_id', backref='employee', cascade="all, delete-orphan")
+        foreign_keys='Dependency.employee_id', backref='employee', cascade="all, delete-orphan", passive_deletes=True,)
     dependent_employees: Mapped[list["Dependency"]] = relationship(
-        foreign_keys='Dependency.dependent_employee_id', backref='dependent_employee', cascade="all, delete-orphan")
+        foreign_keys='Dependency.dependent_employee_id', backref='dependent_employee', cascade="all, delete-orphan", passive_deletes=True,)
 
     # Many to One
     employee_type: Mapped["EmployeeType"] = relationship(backref='employees')

@@ -11,7 +11,7 @@ class DayOffRequest(db.Model):
     __tablename__ = 'day_off_requests'
 
     request_id: Mapped[int] = mapped_column(primary_key=True)
-    employee_id: Mapped[int] = mapped_column(ForeignKey('employees.employee_id'), nullable=False)
+    employee_id: Mapped[int] = mapped_column(ForeignKey('employees.employee_id', ondelete="CASCADE"), nullable=False)
     date: Mapped[dt_date] = mapped_column(Date, nullable=False)
     type_of_vacation: Mapped[str] = mapped_column(String(100), nullable=False)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now)

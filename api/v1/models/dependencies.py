@@ -10,8 +10,9 @@ class Dependency(db.Model):
     __tablename__ = 'dependencies'
 
     dependency_id: Mapped[int] = mapped_column(primary_key=True)
-    employee_id: Mapped[int] = mapped_column(ForeignKey('employees.employee_id'), nullable=False)
-    dependent_employee_id: Mapped[int] = mapped_column(ForeignKey('employees.employee_id'), nullable=False)
+    employee_id: Mapped[int] = mapped_column(ForeignKey('employees.employee_id', ondelete="CASCADE"), nullable=False)
+    dependent_employee_id: Mapped[int] = mapped_column(ForeignKey(
+        'employees.employee_id', ondelete="CASCADE"), nullable=False)
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now, onupdate=datetime.now)
 
