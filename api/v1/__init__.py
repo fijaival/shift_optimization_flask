@@ -12,7 +12,7 @@ print("ええで")
 
 
 # 各リソースのBlueprintを登録
-api_v1_bp.register_blueprint(employees_bp, url_prefix='/employees')
+api_v1_bp.register_blueprint(employees_bp)
 api_v1_bp.register_blueprint(qualifications_bp, url_prefix='/qualifications')
 
 api_v1_bp.register_blueprint(constraints_bp, url_prefix='/constraints')

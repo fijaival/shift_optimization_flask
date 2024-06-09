@@ -4,13 +4,13 @@ from datetime import datetime
 from sqlalchemy import Integer, String,  ForeignKey, DateTime, Column
 from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
 
-from .constraints import Constraint, ConstraintSchema
+from .constraints import Constraint
 from .qualifications import Qualification, QualificationSchema
 from .day_off_requests import DayOffRequest
 from .shifts import Shift
 from .dependencies import Dependency
 from .employee_types import EmployeeType, EmployeeTypeSchema
-from .employee_constraints import EmployeeConstraint
+from .employee_constraints import EmployeeConstraint, EmployeeConstraintSchema
 
 
 employee_qualifications = db.Table(
@@ -63,4 +63,4 @@ class EmployeeSchema(ma.SQLAlchemyAutoSchema):
 
     employee_type = fields.Nested(EmployeeTypeSchema)
     qualifications = fields.Nested(QualificationSchema, many=True)
-    constraints = fields.Nested(ConstraintSchema, many=True)
+    employee_constraints = fields.Nested(EmployeeConstraintSchema, many=True)
