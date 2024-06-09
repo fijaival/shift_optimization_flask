@@ -1,15 +1,15 @@
-from extensions import db
+from extensions import db, ma, fields
 from datetime import datetime
 
 from sqlalchemy import Integer, String,  ForeignKey, DateTime, Column
 from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
 
-from .constraints import Constraint
-from .qualifications import Qualification
+from .constraints import Constraint, ConstraintSchema
+from .qualifications import Qualification, QualificationSchema
 from .day_off_requests import DayOffRequest
 from .shifts import Shift
 from .dependencies import Dependency
-from .employee_types import EmployeeType
+from .employee_types import EmployeeType, EmployeeTypeSchema
 from .employee_constraints import EmployeeConstraint
 
 
@@ -49,9 +49,18 @@ class Employee(db.Model):
         secondary=employee_qualifications, backref=backref('employees', passive_deletes=True))
     # many-to-many relationship to Constraint, bypassing the `EmployeeConstraint` class
     constraints: Mapped[list["Constraint"]] = relationship(
-        secondary="employee_constraints", backref=backref('employees', passive_deletes=True), viewonly=True)
+        secondary="employee_constraints", backref='employees', viewonly=True)
     # association between Employee -> EmployeeConstraint -> Constraint
     employee_constraints: Mapped[list["EmployeeConstraint"]] = relationship(backref='employees')
 
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now, onupdate=datetime.now)
+
+
+class EmployeeSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = Employee
+
+    employee_type = fields.Nested(EmployeeTypeSchema)
+    qualifications = fields.Nested(QualificationSchema, many=True)
+    constraints = fields.Nested(ConstraintSchema, many=True)

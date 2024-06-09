@@ -17,7 +17,7 @@ def get_facilities():
 
 
 @facilities_bp.route('/', methods=['POST'])
-@jwt_required()
+# @jwt_required()
 def add_facility():
     data = request.json
     error = post_facility_schema.validate(data)
@@ -29,6 +29,24 @@ def add_facility():
 
     res = FacilitySchema().dump(new_facility)
     return res, 201
+
+
+@facilities_bp.route('/<int:facility_id>', methods=['DELETE'])
+@jwt_required()
+def delete_facility(facility_id):
+    """Delete a facility from the database."""
+    try:
+        facility = db.session.query(Facility).filter_by(
+            facility_id=facility_id).first()
+
+        if not facility:
+            return jsonify({"message": "Facility not found"}), 404
+
+        db.session.delete(facility)
+        db.session.commit()
+        return jsonify({"message": "Facility deleted successfully!"}), 200
+    except Exception as e:
+        return jsonify({"message": f"Error occurred{e}"}), 500
 
 
 @facilities_bp.route('/<int:facility_id>', methods=['GET'])
@@ -72,6 +90,25 @@ def add_qualification_to_facility(facility_id):
     return res, 201
 
 
+@facilities_bp.route('/<int:facility_id>/qualifications/<int:qualification_id>', methods=['DELETE'])
+@self_facility_required
+def delete_qualification_from_facility(facility_id, qualification_id):
+    facility = Facility.query.filter_by(facility_id=facility_id).first()
+    if not facility:
+        raise InvalidAPIUsage("Facility not found", 404)
+
+    qualification = Qualification.query.filter_by(qualification_id=qualification_id).first()
+    if not qualification:
+        raise InvalidAPIUsage("Qualification not found", 404)
+
+    if any(q.qualification_id == qualification_id for q in facility.qualifications):
+        facility.qualifications.remove(qualification)
+        db.session.commit()
+        return jsonify({"message": "Qualification deleted successfully!"}), 200
+
+    raise InvalidAPIUsage("The facility does not have this qualification", 400)
+
+
 @facilities_bp.route('/<int:facility_id>/constraints', methods=['POST'])
 @self_facility_required
 def add_constraint_to_facility(facility_id):
@@ -98,3 +135,22 @@ def add_constraint_to_facility(facility_id):
     db.session.commit()
     res = FacilitySchema().dump(facility)
     return res, 201
+
+
+@facilities_bp.route('/<int:facility_id>/constraints/<int:constraint_id>', methods=['DELETE'])
+@self_facility_required
+def delete_constraint_from_facility(facility_id, constraint_id):
+    facility = Facility.query.filter_by(facility_id=facility_id).first()
+    if not facility:
+        raise InvalidAPIUsage("Facility not found", 404)
+
+    constraint = Constraint.query.filter_by(constraint_id=constraint_id).first()
+    if not constraint:
+        raise InvalidAPIUsage("Constraint not found", 404)
+
+    if any(q.constraint_id == constraint_id for q in facility.constraints):
+        facility.constraints.remove(constraint)
+        db.session.commit()
+        return jsonify({"message": "Constraint deleted successfully!"}), 200
+
+    raise InvalidAPIUsage("The facility does not have this constraint", 400)

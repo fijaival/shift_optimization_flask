@@ -4,8 +4,8 @@ from .auth import User, UserSchema, TokenBlocklist
 from .constraints import Constraint, ConstraintSchema
 from .day_off_requests import DayOffRequest
 from .dependencies import Dependency
-from .employee_types import EmployeeType
-from .employees import Employee
+from .employee_types import EmployeeType, EmployeeTypeSchema
+from .employees import Employee, EmployeeSchema
 from .qualifications import Qualification, QualificationSchema
 from .shifts import Shift
 from .facilities import Facility, FacilitySchema

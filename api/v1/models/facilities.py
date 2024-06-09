@@ -1,7 +1,8 @@
-from datetime import datetime
 from extensions import db, ma, fields
 from sqlalchemy import Column, String, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
+from datetime import datetime
+
 
 from .employees import Employee
 from .auth import User
@@ -15,8 +16,8 @@ facility_constraints = db.Table(
 )
 facility_qualifications = db.Table(
     "facility_qualifications",
-    Column('facility_id', ForeignKey('facilities.facility_id')),
-    Column('qualification_id', ForeignKey('qualifications.qualification_id'))
+    Column('facility_id', ForeignKey('facilities.facility_id', ondelete='CASCADE')),
+    Column('qualification_id', ForeignKey('qualifications.qualification_id', ondelete='CASCADE')),
 )
 
 
@@ -27,7 +28,7 @@ class Facility(db.Model):
 
     # One to Many
     employees: Mapped[list["Employee"]] = relationship(backref='facility')
-    users: Mapped[list["User"]] = relationship(backref='facility')
+    users: Mapped[list["User"]] = relationship(backref='facility', cascade="all, delete-orphan", passive_deletes=True)
 
     # Many to Many
     constraints: Mapped[list[Constraint]] = relationship(

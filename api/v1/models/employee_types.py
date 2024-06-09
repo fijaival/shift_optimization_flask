@@ -1,4 +1,4 @@
-from extensions import db
+from extensions import db, ma
 from datetime import datetime
 from sqlalchemy import String, DateTime
 from sqlalchemy.orm import relationship, Mapped, mapped_column
@@ -12,3 +12,10 @@ class EmployeeType(db.Model):
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(nullable=False,
                                                  default=datetime.now, onupdate=datetime.now)
+
+
+class EmployeeTypeSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = EmployeeType
+    created_at = ma.auto_field(load_only=True)
+    updated_at = ma.auto_field(load_only=True)
