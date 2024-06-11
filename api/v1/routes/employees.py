@@ -1,10 +1,7 @@
 from extensions import db, jwt_required, self_facility_required
 from sqlalchemy.exc import SQLAlchemyError
-
-from sqlalchemy import select
 from flask import Blueprint, jsonify, request
-from ..models import Employee, EmployeeSchema, facility_constraints, facility_qualifications
-from ..validators import post_employee_schema
+from ..models import EmployeeSchema
 from api.error import InvalidAPIUsage
 
 from ..service.employees import get_all_employees_service, add_employee_service, delete_employee_service, update_employee_service
