@@ -35,16 +35,10 @@ def add_employee(facility_id):
 @self_facility_required
 def delete_employee(facility_id, employee_id):
     "delete employee from facility"
-    try:
-        employee = delete_employee_service(employee_id)
-        if not employee:
-            raise InvalidAPIUsage("Employee not found", 404)
-        return jsonify({"message": "Employee deleted successfully!"}), 200
-    except InvalidAPIUsage as e:
-        raise e
-    except SQLAlchemyError as e:
-        db.session.rollback()
-        raise InvalidAPIUsage("An error occurred while deleting the employee", 500)
+    employee = delete_employee_service(employee_id)
+    if not employee:
+        raise InvalidAPIUsage("Employee not found", 404)
+    return jsonify({"message": "Employee deleted successfully!"}), 200
 
 
 @employees_bp.route('/facilities/<int:facility_id>/employees/<int:employee_id>', methods=["PUT"])

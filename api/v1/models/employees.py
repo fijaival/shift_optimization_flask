@@ -38,13 +38,15 @@ class Employee(db.Model):
     dependencies = relationship(
         'Dependency',
         foreign_keys='Dependency.employee_id',
-        back_populates='employee'
+        back_populates='employee',
+        cascade='all, delete-orphan'
     )
 
     dependents = relationship(
         'Dependency',
         foreign_keys='Dependency.dependent_employee_id',
-        back_populates='dependent_employee'
+        back_populates='dependent_employee',
+        cascade='all, delete-orphan'
     )
     # Many to One
     employee_type: Mapped["EmployeeType"] = relationship(backref='employees')
