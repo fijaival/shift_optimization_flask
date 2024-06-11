@@ -1,7 +1,6 @@
 from flask import Blueprint, jsonify, request
 
 from extensions import db, jwt_required, self_facility_required
-# from extensions.auth import jwt_required, self_facility_required
 
 from ..validators import post_facility_schema, post_qualification_schema, post_constraint_schema
 from ..models import Facility, FacilitySchema, Qualification, Constraint
@@ -13,12 +12,14 @@ facilities_bp = Blueprint('facilities', __name__)
 @facilities_bp.route('/', methods=['GET'])
 @jwt_required()
 def get_facilities():
+    """Get all facilities.これが必要になるときはないかもしれない。"""
     return jsonify({"message": "Facilities data will be returned here."})
 
 
 @facilities_bp.route('/', methods=['POST'])
 # @jwt_required()
 def add_facility():
+    """Add a facility to the database.userより上の権限必要"""
     data = request.json
     error = post_facility_schema.validate(data)
     if error:
@@ -34,7 +35,7 @@ def add_facility():
 @facilities_bp.route('/<int:facility_id>', methods=['DELETE'])
 @jwt_required()
 def delete_facility(facility_id):
-    """Delete a facility from the database."""
+    """Delete a facility from the database.userより上の権限必要?"""
     try:
         facility = db.session.query(Facility).filter_by(
             facility_id=facility_id).first()
@@ -52,6 +53,7 @@ def delete_facility(facility_id):
 @facilities_bp.route('/<int:facility_id>', methods=['GET'])
 @self_facility_required
 def get_facility(facility_id):
+    """Get a facility by its ID."""
     facility = db.session.query(Facility).filter_by(
         facility_id=facility_id).first()
 
@@ -65,6 +67,7 @@ def get_facility(facility_id):
 @facilities_bp.route('/<int:facility_id>/qualifications', methods=['POST'])
 @self_facility_required
 def add_qualification_to_facility(facility_id):
+    """Add a qualification to a facility."""
     data = request.json
     error = post_qualification_schema.validate(data)
     if error:

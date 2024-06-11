@@ -51,7 +51,8 @@ class Employee(db.Model):
     constraints: Mapped[list["Constraint"]] = relationship(
         secondary="employee_constraints", backref='employees', viewonly=True)
     # association between Employee -> EmployeeConstraint -> Constraint
-    employee_constraints: Mapped[list["EmployeeConstraint"]] = relationship(backref='employees')
+    employee_constraints: Mapped[list["EmployeeConstraint"]] = relationship(
+        backref='employees', cascade="all, delete-orphan", passive_deletes=True)
 
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now, onupdate=datetime.now)
