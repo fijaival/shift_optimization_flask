@@ -68,12 +68,3 @@ def update_employee(facility_id, employee_id):
     updated_employee = update_employee_service(facility_id, employee_id, data)
     res = EmployeeSchema().dump(updated_employee)
     return res, 201
-
-    employee = Employee.query.filter_by(employee_id=employee_id).first()
-    if not employee:
-        raise InvalidAPIUsage("Employee not found", 404)
-    employee.first_name = data['first_name']
-    employee.last_name = data['last_name']
-    employee.employee_type_id = data['employee_type_id']
-    db.session.commit()
-    return jsonify({"message": "Employee updated successfully!"}), 200
