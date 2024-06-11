@@ -9,16 +9,6 @@ from api.error import InvalidAPIUsage
 
 from ..service.employees import get_all_employees_service, add_employee_service, delete_employee_service, update_employee_service
 
-#############
-from ..models.qualifications import Qualification
-from ..models import Constraint
-from ..models.dependencies import Dependency
-
-
-from ..schemas import employee_schema, employees_schema
-# from ..models.employee_qualifications import EmployeeQualification
-# from ..models.employee_constraints import EmployeeConstraint
-
 employees_bp = Blueprint('employees', __name__)
 
 

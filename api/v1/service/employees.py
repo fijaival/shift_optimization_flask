@@ -1,3 +1,6 @@
+import logging
+from sqlalchemy.exc import IntegrityError
+
 from sqlalchemy import select
 from extensions import db, jwt_required, self_facility_required
 from sqlalchemy.exc import SQLAlchemyError
@@ -5,7 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 
 from api.error import InvalidAPIUsage
 from ..validators import post_employee_schema, put_employee_schema
-from ..models import Qualification, EmployeeConstraint, Constraint, Employee, Facility, EmployeeType
+from ..models import Qualification, EmployeeConstraint, Constraint, Employee, Facility, EmployeeType, Dependency
 from ..models import facility_qualifications, facility_constraints
 
 
@@ -22,6 +25,7 @@ def add_employee_service(facility_id, data):
     has_employee_type(data['employee_type_id'])
     has_constraint(facility_id, data['constraints'])
     has_qualification(facility_id, data['qualifications'])
+    has_employee(facility_id, data["dependencies"])
 
     new_employee = Employee(
         first_name=data['first_name'],
@@ -36,6 +40,10 @@ def add_employee_service(facility_id, data):
     for qual_data in data['qualifications']:
         found_qual = Qualification.query.filter_by(qualification_id=qual_data["qualification_id"]).first()
         new_employee.qualifications.append(found_qual)
+    for dep_data in data['dependencies']:
+        dependency = Dependency(dependent_employee_id=dep_data)
+        new_employee.dependencies.append(dependency)
+
     db.session.add(new_employee)
     db.session.commit()
     return new_employee
@@ -60,13 +68,14 @@ def update_employee_service(facility_id, employee_id, data):
     if error:
         raise InvalidAPIUsage(error)
 
-    employee = Employee.query.filter_by(employee_id=employee_id).first()
+    employee = Employee.query.filter_by(employee_id=employee_id, facility_id=facility_id).first()
     if not employee:
         raise InvalidAPIUsage("Employee not found", 404)
 
     has_employee_type(data['employee_type_id'])
     has_constraint(facility_id, data['constraints'])
     has_qualification(facility_id, data['qualifications'])
+    has_employee(facility_id, data["dependencies"])
 
     employee.first_name = data['first_name']
     employee.last_name = data['last_name']
@@ -81,7 +90,29 @@ def update_employee_service(facility_id, employee_id, data):
     for qual_data in data['qualifications']:
         found_qual = Qualification.query.filter_by(qualification_id=qual_data["qualification_id"]).first()
         employee.qualifications.append(found_qual)
-    db.session.commit()
+
+    # 依存関係の更新について
+    # depnedency.qualifications.clear()がデータベースに反映されないので、
+    # 既存のものをcommitしてから
+    # 依存関係を追加する
+    try:
+        Dependency.query.filter_by(employee_id=employee_id).delete()
+        db.session.commit()
+    except IntegrityError as e:
+        db.session.rollback()
+        raise InvalidAPIUsage("Failed to clear dependencies", 400)
+
+    for dep_data in data['dependencies']:
+        dependency = Dependency(employee_id=employee_id, dependent_employee_id=dep_data)
+        employee.dependencies.append(dependency)
+
+    try:
+        db.session.commit()
+    except IntegrityError as e:
+        db.session.rollback()
+        raise InvalidAPIUsage("Failed to update dependencies", 400)
+
+    return employee
 
 
 def has_employee_type(employee_type_id):
@@ -114,3 +145,10 @@ def has_qualification(facility_id, qualifications):
         if not has_qual:
             raise InvalidAPIUsage("This facility does not have the qualification with ID " +
                                   f"{q["qualification_id"]} registered.", 404)
+
+
+def has_employee(facility_id, dependencies):
+    for d in dependencies:
+        employee = Employee.query.filter_by(employee_id=d, facility_id=facility_id).first()
+        if not employee:
+            raise InvalidAPIUsage("dependency not found", 404)
