@@ -2,7 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from .auth import User, UserSchema, TokenBlocklist
 from .constraints import Constraint, ConstraintSchema
-from .day_off_requests import DayOffRequest
+from .day_off_requests import DayOffRequest, DayOffRequestSchema
 from .employee_types import EmployeeType, EmployeeTypeSchema
 from .employees import Employee, EmployeeSchema, employee_qualifications, Dependency, DependencySchema
 from .employee_constraints import EmployeeConstraint

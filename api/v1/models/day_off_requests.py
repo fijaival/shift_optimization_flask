@@ -1,4 +1,4 @@
-from extensions import db
+from extensions import db, ma
 from datetime import datetime
 from datetime import date as dt_date
 
@@ -20,3 +20,8 @@ class DayOffRequest(db.Model):
     __table_args__ = (
         UniqueConstraint('employee_id', 'date', name='uq_day_off_request'),
     )
+
+
+class DayOffRequestSchema(ma.SQLAlchemyAutoSchema):
+    class Meta:
+        model = DayOffRequest
