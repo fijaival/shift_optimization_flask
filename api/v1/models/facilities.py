@@ -1,5 +1,5 @@
 from extensions import db, ma, fields
-from sqlalchemy import Column, String, ForeignKey
+from sqlalchemy import Column, String, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
 from datetime import datetime
 
@@ -12,12 +12,14 @@ from .qualifications import Qualification, QualificationSchema
 facility_constraints = db.Table(
     "facility_constraints",
     Column('facility_id', ForeignKey('facilities.facility_id', ondelete='CASCADE')),
-    Column('constraint_id', ForeignKey('constraints.constraint_id', ondelete='CASCADE'))
+    Column('constraint_id', ForeignKey('constraints.constraint_id', ondelete='CASCADE')),
+    UniqueConstraint('facility_id', 'constraint_id', name='uq_facility_constraint')
 )
 facility_qualifications = db.Table(
     "facility_qualifications",
     Column('facility_id', ForeignKey('facilities.facility_id', ondelete='CASCADE')),
     Column('qualification_id', ForeignKey('qualifications.qualification_id', ondelete='CASCADE')),
+    UniqueConstraint('facility_id', 'qualification_id', name='uq_facility_qualification')
 )
 
 

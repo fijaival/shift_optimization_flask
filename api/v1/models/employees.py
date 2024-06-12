@@ -1,7 +1,7 @@
 from extensions import db, ma, fields
 from datetime import datetime
 
-from sqlalchemy import Integer, String,  ForeignKey, DateTime, Column, UniqueConstraint
+from sqlalchemy import Integer, String,  ForeignKey, DateTime, Column, UniqueConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
 
 from .constraints import Constraint
@@ -15,7 +15,9 @@ from .employee_constraints import EmployeeConstraint, EmployeeConstraintSchema
 employee_qualifications = db.Table(
     "employee_qualifications",
     Column('employee_id', ForeignKey('employees.employee_id', ondelete="CASCADE")),
-    Column('qualification_id', ForeignKey('qualifications.qualification_id', ondelete="CASCADE"))
+    Column('qualification_id', ForeignKey('qualifications.qualification_id', ondelete="CASCADE")),
+    UniqueConstraint('employee_id', 'qualification_id', name='uq_employee_qualification')
+
 )
 
 
