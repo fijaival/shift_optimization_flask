@@ -12,13 +12,19 @@ from .utils import validate_data, get_instance_by_id, save_to_db, delete_from_db
 def signup_user(data):
 
     validate_data(post_user_schema, data)
-    user = User.query.filter_by(username=data["username"], facility_id=data["facility_id"]).first()
-    if user:
-        return None
-    new_user = User(**data)
-    save_to_db(new_user)
-    res = UserSchema().dump(new_user)
-    return res
+    try:
+        user = User.query.filter_by(username=data["username"], facility_id=data["facility_id"]).first()
+        if user:
+            return None
+        new_user = User(**data)
+        save_to_db(new_user)
+        res = UserSchema().dump(new_user)
+        return res
+    except Exception as e:
+        if "foreign key constraint" in str(e):
+            raise InvalidAPIUsage("The facility does not exist.", 400)
+        else:
+            raise InvalidAPIUsage("An error occurred while saving the user.", 500)
 
 
 def login_user(data):

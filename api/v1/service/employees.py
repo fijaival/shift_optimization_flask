@@ -19,32 +19,35 @@ def get_all_employees_service(facility_id):
 
 
 def add_employee_service(facility_id, data):
-    validate_data(post_employee_schema, data)
+    try:
+        validate_data(post_employee_schema, data)
 
-    has_employee_type(data['employee_type_id'])
-    has_constraint(facility_id, data['constraints'])
-    has_qualification(facility_id, data['qualifications'])
-    has_employee(facility_id, data["dependencies"])
+        has_employee_type(data['employee_type_id'])
+        has_constraint(facility_id, data['constraints'])
+        has_qualification(facility_id, data['qualifications'])
+        has_employee(facility_id, data["dependencies"])
 
-    new_employee = Employee(
-        first_name=data['first_name'],
-        last_name=data['last_name'],
-        employee_type_id=data['employee_type_id'],
-        facility_id=facility_id
-    )
-    for const_data in data['constraints']:
-        found_cons = Constraint.query.filter_by(constraint_id=const_data["constraint_id"]).first()
-        employee_constraint = EmployeeConstraint(constraint=found_cons, value=const_data["value"])
-        new_employee.employee_constraints.append(employee_constraint)
-    for qual_data in data['qualifications']:
-        found_qual = Qualification.query.filter_by(qualification_id=qual_data["qualification_id"]).first()
-        new_employee.qualifications.append(found_qual)
-    for dep_data in data['dependencies']:
-        dependency = Dependency(dependent_employee_id=dep_data)
-        new_employee.dependencies.append(dependency)
+        new_employee = Employee(
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            employee_type_id=data['employee_type_id'],
+            facility_id=facility_id
+        )
+        for const_data in data['constraints']:
+            found_cons = Constraint.query.filter_by(constraint_id=const_data["constraint_id"]).first()
+            employee_constraint = EmployeeConstraint(constraint=found_cons, value=const_data["value"])
+            new_employee.employee_constraints.append(employee_constraint)
+        for qual_data in data['qualifications']:
+            found_qual = Qualification.query.filter_by(qualification_id=qual_data["qualification_id"]).first()
+            new_employee.qualifications.append(found_qual)
+        for dep_data in data['dependencies']:
+            dependency = Dependency(dependent_employee_id=dep_data)
+            new_employee.dependencies.append(dependency)
 
-    save_to_db(new_employee)
-    return new_employee
+        save_to_db(new_employee)
+        return new_employee
+    except IntegrityError as e:
+        raise InvalidAPIUsage("An error occurred while saving the employee", 500)
 
 
 def delete_employee_service(employee_id):
@@ -125,8 +128,8 @@ def has_qualification(facility_id, qualifications):
         if not qualification:
             raise InvalidAPIUsage("Qualification not found", 404)
         if not any(qual.qualification_id == q["qualification_id"] for qual in facility.qualifications):
-            raise InvalidAPIUsage(f"This facility does not have the qualification with ID {
-                                  q['qualification_id']} registered.", 404)
+            raise InvalidAPIUsage("This facility does not have the qualification with ID" +
+                                  f"{q['qualification_id']} registered.", 404)
 
 
 def has_employee(facility_id, dependencies):

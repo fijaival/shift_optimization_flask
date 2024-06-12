@@ -20,9 +20,9 @@ def save_to_db(instance):
     try:
         db.session.add(instance)
         db.session.commit()
-    except SQLAlchemyError as e:
+    except IntegrityError as sqlalchemy_error:
         db.session.rollback()
-        raise InvalidAPIUsage(f"An error occurred: {str(e)}", 500)
+        raise sqlalchemy_error
 
 
 def delete_from_db(instance):

@@ -2,6 +2,7 @@ from extensions import db
 from ..validators import post_facility_schema, post_qualification_schema, post_constraint_schema
 from ..models import Facility, FacilitySchema, Qualification, Constraint
 from api.error import InvalidAPIUsage
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
 from .utils import validate_data, get_instance_by_id, save_to_db, delete_from_db
 
@@ -29,19 +30,23 @@ def get_facility_service(facility_id):
 
 
 def add_qualification_to_facility_service(facility_id, data):
-    validate_data(post_qualification_schema, data)
-    qualification = Qualification.query.filter_by(name=data['name']).first()
-    if not qualification:
-        qualification = Qualification(**data)
-        save_to_db(qualification)
-    facility = get_instance_by_id(Facility, facility_id, 'facility_id')
-    if not facility:
-        raise InvalidAPIUsage("Facility not found", 404)
-    if any(q.name == data['name'] for q in facility.qualifications):
-        raise InvalidAPIUsage("The facility already has its qualification", 400)
-    facility.qualifications.append(qualification)
-    db.session.commit()
-    return FacilitySchema().dump(facility)
+    try:
+        validate_data(post_qualification_schema, data)
+        qualification = Qualification.query.filter_by(name=data['name']).first()
+        if not qualification:
+            qualification = Qualification(**data)
+            save_to_db(qualification)
+        facility = get_instance_by_id(Facility, facility_id, 'facility_id')
+        if not facility:
+            raise InvalidAPIUsage("Facility not found", 404)
+        facility.qualifications.append(qualification)
+        db.session.commit()
+        return FacilitySchema().dump(facility)
+    except IntegrityError as e:
+        if 'Duplicate' in str(e.orig):
+            raise InvalidAPIUsage("The facility already has its qualification", 400)
+        else:
+            raise InvalidAPIUsage("An error occurred while saving the qualification", 500)
 
 
 def delete_qualification_from_facility_service(facility_id, qualification_id):
@@ -59,19 +64,24 @@ def delete_qualification_from_facility_service(facility_id, qualification_id):
 
 
 def add_constraint_to_facility_service(facility_id, data):
-    validate_data(post_constraint_schema, data)
-    constraint = Constraint.query.filter_by(name=data['name']).first()
-    if not constraint:
-        constraint = Constraint(**data)
-        save_to_db(constraint)
-    facility = Facility.query.filter_by(facility_id=facility_id).first()
-    if not facility:
-        raise InvalidAPIUsage("Facility not found", 404)
-    if any(q.name == data['name'] for q in facility.constraints):
-        raise InvalidAPIUsage("The facility already has its constraint", 400)
-    facility.constraints.append(constraint)
-    db.session.commit()
-    return FacilitySchema().dump(facility)
+    try:
+        validate_data(post_constraint_schema, data)
+        constraint = Constraint.query.filter_by(name=data['name']).first()
+        if not constraint:
+            constraint = Constraint(**data)
+            save_to_db(constraint)
+        facility = Facility.query.filter_by(facility_id=facility_id).first()
+        if not facility:
+            raise InvalidAPIUsage("Facility not found", 404)
+        facility.constraints.append(constraint)
+        db.session.commit()
+        return FacilitySchema().dump(facility)
+    except IntegrityError as e:
+        print(e.orig)
+        if 'Duplicate' in str(e.orig):
+            raise InvalidAPIUsage("The facility already has its constraint", 400)
+        else:
+            raise InvalidAPIUsage("An error occurred while saving the constraint", 500)
 
 
 def delete_constraint_from_facility_service(facility_id, constraint_id):
