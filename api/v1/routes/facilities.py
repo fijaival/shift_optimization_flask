@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 
-from extensions import db, jwt_required, self_facility_required
+from extensions import Base, jwt_required, self_facility_required
 
 from ..validators import post_facility_schema, post_qualification_schema, post_constraint_schema
 from ..models import Facility, FacilitySchema, Qualification, Constraint

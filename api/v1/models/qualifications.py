@@ -1,11 +1,11 @@
-from extensions import db, ma
+from extensions import Base, ma
 from datetime import datetime
 
 from sqlalchemy import String
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 
-class Qualification(db.Model):
+class Qualification(Base):
     __tablename__ = 'qualifications'
 
     qualification_id: Mapped[int] = mapped_column(primary_key=True)

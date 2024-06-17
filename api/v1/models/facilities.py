@@ -1,5 +1,5 @@
-from extensions import db, ma, fields
-from sqlalchemy import Column, String, ForeignKey, UniqueConstraint
+from extensions import Base, ma, fields
+from sqlalchemy import Column, String, ForeignKey, UniqueConstraint, Table
 from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
 from datetime import datetime
 
@@ -9,21 +9,23 @@ from .auth import User
 from .constraints import Constraint, ConstraintSchema
 from .qualifications import Qualification, QualificationSchema
 
-facility_constraints = db.Table(
+facility_constraints = Table(
     "facility_constraints",
+    Base.metadata,
     Column('facility_id', ForeignKey('facilities.facility_id', ondelete='CASCADE')),
     Column('constraint_id', ForeignKey('constraints.constraint_id', ondelete='CASCADE')),
     UniqueConstraint('facility_id', 'constraint_id', name='uq_facility_constraint')
 )
-facility_qualifications = db.Table(
+facility_qualifications = Table(
     "facility_qualifications",
+    Base.metadata,
     Column('facility_id', ForeignKey('facilities.facility_id', ondelete='CASCADE')),
     Column('qualification_id', ForeignKey('qualifications.qualification_id', ondelete='CASCADE')),
     UniqueConstraint('facility_id', 'qualification_id', name='uq_facility_qualification')
 )
 
 
-class Facility(db.Model):
+class Facility(Base):
     __tablename__ = 'facilities'
     facility_id: Mapped[int] = mapped_column(primary_key=True)
     facility_name: Mapped[str] = mapped_column(String(191), nullable=False)

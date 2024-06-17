@@ -1,4 +1,4 @@
-from extensions import db
+from extensions import Base
 from datetime import datetime
 from datetime import date as dt_date
 
@@ -6,7 +6,7 @@ from sqlalchemy import String, UniqueConstraint, ForeignKey, Date, DateTime
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 
-class Shift(db.Model):
+class Shift(Base):
     __tablename__ = 'shifts'
 
     shift_id: Mapped[int] = mapped_column(primary_key=True)

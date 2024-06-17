@@ -1,4 +1,4 @@
-from extensions import db, ma
+from extensions import Base, ma
 from datetime import datetime
 from datetime import date as dt_date
 
@@ -7,7 +7,7 @@ from sqlalchemy import String, Date, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 
-class DayOffRequest(db.Model):
+class DayOffRequest(Base):
     __tablename__ = 'day_off_requests'
 
     request_id: Mapped[int] = mapped_column(primary_key=True)

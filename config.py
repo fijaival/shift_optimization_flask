@@ -9,7 +9,7 @@ class Config:
     # httplonlyはデフォルトでTrue
     JWT_SECRET_KEY = os.getenv('JWT_SECRET_KEY')
     JWT_ALGORITHM = 'HS256'
-    JWT_ACCESS_TOKEN_EXPIRES = timedelta(minutes=15)
+    JWT_ACCESS_TOKEN_EXPIRES = timedelta(days=1)  # これ開発用
     JWT_REFRESH_TOKEN_EXPIRES = timedelta(days=2)
     JWT_TOKEN_LOCATION = ["cookies"]
     JWT_COOKIE_SAMESITE = 'Lax'
@@ -21,9 +21,9 @@ class Config:
     JSON_AS_ASCII = False
 
     SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://{user}:{password}@{host}:{PORT}/{db_name}?charset=utf8'.format(**{
-        'user': 'ope1',
-        'password': 'ope1',
-        'host': 'localhost',
-        'PORT': "3306",
-        'db_name': 'shiftOptimization'
+        'user': os.getenv('DB_USER'),
+        'password': os.getenv('DB_PASSWORD'),
+        'host':     os.getenv('DB_HOST'),
+        'PORT':    os.getenv('DB_PORT'),
+        'db_name': os.getenv('DB_NAME'),
     })

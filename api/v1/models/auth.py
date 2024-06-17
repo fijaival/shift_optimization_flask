@@ -1,12 +1,12 @@
 from datetime import datetime
-from extensions import db, ma, fields
+from extensions import Base, ma, fields
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 
-class User(db.Model):
+class User(Base):
     __tablename__ = 'users'
     user_id: Mapped[int] = mapped_column(primary_key=True)
     facility_id: Mapped[int] = mapped_column(ForeignKey('facilities.facility_id', ondelete='CASCADE'), nullable=False)
@@ -38,7 +38,8 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
         'facility_id', 'facility_name'))
 
 
-class TokenBlocklist(db.Model):  # type: ignore
+class TokenBlocklist(Base):  # type: ignore
+    __tablename__ = 'token_blocklist'
     id: Mapped[int] = mapped_column(primary_key=True)
     jti: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
     type: Mapped[str] = mapped_column(String(16), nullable=False)

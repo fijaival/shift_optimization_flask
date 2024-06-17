@@ -1,4 +1,4 @@
-from extensions import db, jwt_required, self_facility_required
+from extensions import Base, jwt_required, self_facility_required
 from sqlalchemy.exc import SQLAlchemyError
 from flask import Blueprint, jsonify, request
 from ..models import EmployeeSchema
@@ -26,8 +26,7 @@ def get_employee(facility_id):
 def add_employee(facility_id):
     "add employee to facility"
     data = request.json
-    new_employee = add_employee_service(facility_id, data)
-    res = EmployeeSchema().dump(new_employee)
+    res = add_employee_service(facility_id, data)
     return res, 201
 
 
@@ -46,6 +45,5 @@ def delete_employee(facility_id, employee_id):
 def update_employee(facility_id, employee_id):
     "update employee information"
     data = request.json
-    updated_employee = update_employee_service(facility_id, employee_id, data)
-    res = EmployeeSchema().dump(updated_employee)
+    res = update_employee_service(facility_id, employee_id, data)
     return res, 201

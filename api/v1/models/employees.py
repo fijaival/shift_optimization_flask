@@ -1,7 +1,7 @@
-from extensions import db, ma, fields
+from extensions import Base, ma, fields
 from datetime import datetime
 
-from sqlalchemy import Integer, String,  ForeignKey, DateTime, Column, UniqueConstraint, UniqueConstraint
+from sqlalchemy import Integer, String,  ForeignKey, Table, Column, UniqueConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
 
 from .constraints import Constraint
@@ -12,8 +12,9 @@ from .employee_types import EmployeeType, EmployeeTypeSchema
 from .employee_constraints import EmployeeConstraint, EmployeeConstraintSchema
 
 
-employee_qualifications = db.Table(
+employee_qualifications = Table(
     "employee_qualifications",
+    Base.metadata,
     Column('employee_id', ForeignKey('employees.employee_id', ondelete="CASCADE")),
     Column('qualification_id', ForeignKey('qualifications.qualification_id', ondelete="CASCADE")),
     UniqueConstraint('employee_id', 'qualification_id', name='uq_employee_qualification')
@@ -21,7 +22,7 @@ employee_qualifications = db.Table(
 )
 
 
-class Employee(db.Model):
+class Employee(Base):
     __tablename__ = 'employees'
 
     employee_id: Mapped[int] = mapped_column(Integer, primary_key=True)
@@ -67,7 +68,7 @@ class Employee(db.Model):
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now, onupdate=datetime.now)
 
 
-class Dependency(db.Model):
+class Dependency(Base):
     __tablename__ = 'dependencies'
 
     dependency_id: Mapped[int] = mapped_column(primary_key=True)

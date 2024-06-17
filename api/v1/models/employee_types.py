@@ -1,10 +1,10 @@
-from extensions import db, ma
+from extensions import Base, ma
 from datetime import datetime
 from sqlalchemy import String, DateTime
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 
-class EmployeeType(db.Model):
+class EmployeeType(Base):
     __tablename__ = 'employee_types'
 
     employee_type_id: Mapped[int] = mapped_column(primary_key=True)

@@ -1,13 +1,9 @@
 from flask import Flask, jsonify
 from config import Config
 from flask_cors import CORS
-from extensions import db, jwt
+from extensions import Base, jwt, db_session, init_db
 from api.v1 import api_v1_bp
 from flask_migrate import Migrate
-from flask_jwt_extended import JWTManager
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import event
-from sqlalchemy.engine import Engine
 from .error import InvalidAPIUsage
 
 app = Flask(__name__)
@@ -18,13 +14,19 @@ CORS(app,
      supports_credentials=True,
      )
 
-db.init_app(app)
-migrate = Migrate(app, db)
+# db.init_app(app)
+migrate = Migrate()
+migrate.init_app(app, db_session, directory='migrations')
 
 
 @app.before_first_request
 def init():
-    db.create_all()
+    init_db()
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()
 
 
 app.register_blueprint(api_v1_bp, url_prefix='/v1')

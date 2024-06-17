@@ -1,4 +1,4 @@
-from extensions import db, ma, fields
+from extensions import Base, ma, fields
 from datetime import datetime
 
 from sqlalchemy import Integer, ForeignKey, UniqueConstraint, UniqueConstraint, DateTime
@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from .constraints import Constraint, ConstraintSchema
 
 
-class EmployeeConstraint(db.Model):
+class EmployeeConstraint(Base):
     __tablename__ = 'employee_constraints'
 
     employee_id: Mapped[int] = mapped_column(ForeignKey(

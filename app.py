@@ -1,8 +1,5 @@
-from api import create_app
+from api import app
 import ssl
-
-
-app = create_app()
 
 if __name__ == '__main__':
     # httpsでの実行はpython app.pyで実行

@@ -1,4 +1,4 @@
-from extensions import db
+# from extensions import db_session
 from api.error import InvalidAPIUsage
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 
@@ -9,30 +9,29 @@ def validate_data(schema, data):
         raise InvalidAPIUsage(error)
 
 
-def get_instance_by_id(model, id, id_field):
-    instance = model.query.filter_by(**{id_field: id}).first()
+def get_instance_by_id(model, id, id_field, session):
+    instance = session.query(model).filter_by(**{id_field: id}).first()
     if not instance:
         return None
     return instance
 
 
-def save_to_db(instance):
+def save_to_db(instance, session):
     try:
-        db.session.add(instance)
-        db.session.commit()
+        session.add(instance)
+        session.commit()
     except IntegrityError as sqlalchemy_error:
-        db.session.rollback()
+        session.rollback()
         raise sqlalchemy_error
 
 
-def delete_from_db(instance):
+def delete_from_db(instance, session):
     try:
-        db.session.delete(instance)
-        db.session.commit()
+        session.delete(instance)
+        session.commit()
     except IntegrityError:
-        db.session.rollback()
+        session.rollback()
         raise
-        # raise InvalidAPIUsage("Cannot delete due to external constraints.", 400)
     except SQLAlchemyError as e:
-        db.session.rollback()
+        session.rollback()
         raise InvalidAPIUsage(f"An error occurred while deleting: {str(e)}", 500)
