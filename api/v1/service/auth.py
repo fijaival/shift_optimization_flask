@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from ..models import User, UserSchema, TokenBlocklist
 from ..validators import post_user_schema, login_user_schema
 from api.error import InvalidAPIUsage
-from .utils import validate_data, get_instance_by_id, save_to_db, delete_from_db
+from .utils import validate_data, save_to_db
 
 
 def signup_user(data):

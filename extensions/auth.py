@@ -1,13 +1,10 @@
-from flask import abort, jsonify
+from flask import jsonify
 
 
 from flask_jwt_extended import (
-    JWTManager, verify_jwt_in_request, get_jwt, jwt_required
+    JWTManager, verify_jwt_in_request, get_jwt
 )
-from functools import wraps  # デコレータ作成用
-
-'''以下で、JWTの挙動をデフォルトから変更する(エラーのフォーマットを変えるなど)'''
-# アクセストークンに、権限情報も含めるようにする
+from functools import wraps
 jwt = JWTManager()
 
 

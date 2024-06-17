@@ -1,7 +1,6 @@
 import logging
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from sqlalchemy.orm import scoped_session
-from extensions import Base, db_session, jwt_required, self_facility_required
+from extensions import db_session
 from api.error import InvalidAPIUsage
 from ..validators import post_employee_schema, put_employee_schema
 from ..models import Qualification, EmployeeConstraint, Constraint, Employee, Facility, EmployeeType, Dependency, EmployeeSchema

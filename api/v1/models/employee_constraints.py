@@ -1,7 +1,7 @@
 from extensions import Base, ma, fields
 from datetime import datetime
 
-from sqlalchemy import Integer, ForeignKey, UniqueConstraint, UniqueConstraint, DateTime
+from sqlalchemy import ForeignKey, UniqueConstraint, UniqueConstraint, DateTime
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from .constraints import Constraint, ConstraintSchema
 

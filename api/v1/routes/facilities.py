@@ -1,10 +1,6 @@
 from flask import Blueprint, jsonify, request
-
-from extensions import Base, jwt_required, self_facility_required
-
-from ..validators import post_facility_schema, post_qualification_schema, post_constraint_schema
-from ..models import Facility, FacilitySchema, Qualification, Constraint
 from api.error import InvalidAPIUsage
+from extensions import Base, jwt_required, self_facility_required
 from ..service.facilities import validate_and_create_facility_service, delete_facility_service, get_facility_service, add_qualification_to_facility_service, delete_qualification_from_facility_service, add_constraint_to_facility_service, delete_constraint_from_facility_service
 
 facilities_bp = Blueprint('facilities', __name__)

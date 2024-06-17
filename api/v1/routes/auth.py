@@ -1,5 +1,5 @@
+from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
-from flask import Blueprint, jsonify, request
 from api.error import InvalidAPIUsage
 from ..service.auth import signup_user, login_user, refresh_token, logout_user
 

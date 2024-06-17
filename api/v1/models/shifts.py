@@ -2,8 +2,8 @@ from extensions import Base
 from datetime import datetime
 from datetime import date as dt_date
 
-from sqlalchemy import String, UniqueConstraint, ForeignKey, Date, DateTime
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy import String, UniqueConstraint, ForeignKey, Date
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class Shift(Base):

@@ -7,7 +7,7 @@ from extensions import db_session
 from api.error import InvalidAPIUsage
 from ..models import DayOffRequest, Employee, DayOffRequestSchema
 from ..validators import post_day_off_request_schema
-from .utils import validate_data, get_instance_by_id, save_to_db, delete_from_db
+from .utils import validate_data, save_to_db, delete_from_db
 
 
 def get_all_requests_services(facility_id, year, month):

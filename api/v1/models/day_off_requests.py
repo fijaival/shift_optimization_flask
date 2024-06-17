@@ -2,7 +2,7 @@ from extensions import Base, ma, fields
 from datetime import datetime
 from datetime import date as dt_date
 from sqlalchemy import String, Date, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class DayOffRequest(Base):

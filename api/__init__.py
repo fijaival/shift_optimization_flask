@@ -14,7 +14,6 @@ CORS(app,
      supports_credentials=True,
      )
 
-# db.init_app(app)
 migrate = Migrate()
 migrate.init_app(app, db_session, directory='migrations')
 

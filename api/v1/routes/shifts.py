@@ -1,5 +1,5 @@
 from sqlalchemy import extract, between
-from extensions import db
+from extensions import Base
 
 
 from flask import Blueprint, jsonify, request

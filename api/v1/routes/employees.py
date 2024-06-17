@@ -1,9 +1,7 @@
-from extensions import Base, jwt_required, self_facility_required
-from sqlalchemy.exc import SQLAlchemyError
 from flask import Blueprint, jsonify, request
-from ..models import EmployeeSchema
 from api.error import InvalidAPIUsage
-
+from extensions import self_facility_required
+from ..models import EmployeeSchema
 from ..service.employees import get_all_employees_service, add_employee_service, delete_employee_service, update_employee_service
 
 employees_bp = Blueprint('employees', __name__)

@@ -2,7 +2,7 @@ from extensions import db_session
 from ..validators import post_facility_schema, post_qualification_schema, post_constraint_schema
 from ..models import Facility, FacilitySchema, Qualification, Constraint
 from api.error import InvalidAPIUsage
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
+from sqlalchemy.exc import IntegrityError
 
 from .utils import validate_data, get_instance_by_id, save_to_db, delete_from_db
 

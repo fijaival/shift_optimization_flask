@@ -1,4 +1,3 @@
-# from extensions import db_session
 from api.error import InvalidAPIUsage
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 

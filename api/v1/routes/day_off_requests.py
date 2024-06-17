@@ -1,17 +1,7 @@
-from extensions import Base, jwt_required, self_facility_required
-from sqlalchemy.exc import SQLAlchemyError
 from flask import Blueprint, jsonify, request
-from ..service.day_off_requests import get_all_requests_services, post_day_off_request_service, delete_request_service, update_request_service
 from api.error import InvalidAPIUsage
-# ------------------------------------------------------
-
-from flask import Blueprint, jsonify, request
-from flask_jwt_extended import jwt_required
-from datetime import datetime
-from sqlalchemy import extract
-
-from ..models import DayOffRequest, DayOffRequestSchema
-
+from extensions import self_facility_required
+from ..service.day_off_requests import get_all_requests_services, post_day_off_request_service, delete_request_service, update_request_service
 
 day_off_requests_bp = Blueprint('day_off_requests', __name__)
 

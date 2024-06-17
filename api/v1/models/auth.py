@@ -3,7 +3,7 @@ from extensions import Base, ma, fields
 
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import String, ForeignKey
-from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class User(Base):

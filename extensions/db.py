@@ -1,18 +1,9 @@
 import os
-from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow, fields
-from sqlalchemy.dialects.mysql import TINYINT, VARBINARY
-from sqlalchemy.orm import DeclarativeBase
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-
-# class Base(DeclarativeBase):
-#     pass
-
-
-# db = SQLAlchemy(model_class=Base)
 
 ma = Marshmallow()
 database_uri = 'mysql+pymysql://{user}:{password}@{host}:{PORT}/{db_name}?charset=utf8'.format(**{
@@ -23,9 +14,7 @@ database_uri = 'mysql+pymysql://{user}:{password}@{host}:{PORT}/{db_name}?charse
     'db_name': os.getenv('DB_NAME'),
 })
 engine = create_engine(database_uri, pool_pre_ping=True)
-db_session = scoped_session(sessionmaker(autocommit=False,
-                                         autoflush=False,
-                                         bind=engine))
+db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
 Base = declarative_base()
 Base.query = db_session.query_property()
 
