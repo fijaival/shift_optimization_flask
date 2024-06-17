@@ -1,8 +1,6 @@
-from extensions import Base, ma
+from extensions import Base, ma, fields
 from datetime import datetime
 from datetime import date as dt_date
-
-
 from sqlalchemy import String, Date, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 
@@ -25,3 +23,4 @@ class DayOffRequest(Base):
 class DayOffRequestSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = DayOffRequest
+    employee = fields.Nested('EmployeeSchema', only=('employee_id', 'first_name', 'last_name'))

@@ -1,4 +1,4 @@
-from extensions import db, jwt_required, self_facility_required
+from extensions import Base, jwt_required, self_facility_required
 from sqlalchemy.exc import SQLAlchemyError
 from flask import Blueprint, jsonify, request
 from ..service.day_off_requests import get_all_requests_services, post_day_off_request_service
@@ -18,8 +18,11 @@ day_off_requests_bp = Blueprint('day_off_requests', __name__)
 
 @day_off_requests_bp.route('/facilities/<int:facility_id>/requests')
 @self_facility_required
-def get_all_requests():
-    pass
+def get_all_requests(facility_id):
+    year = request.args.get('year')
+    month = request.args.get('month')
+    res = get_all_requests_services(facility_id, year, month)
+    return res, 200
 
 
 @day_off_requests_bp.route('/facilities/<int:facility_id>/employees/<int:employee_id>/requests', methods=["POST"])
@@ -27,7 +30,6 @@ def get_all_requests():
 def add_request(facility_id, employee_id):
     data = request.json
     res = post_day_off_request_service(facility_id, employee_id, data)
-    res = DayOffRequestSchema().dump(res)
     return res, 201
 
 
