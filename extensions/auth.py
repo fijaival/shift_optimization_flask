@@ -2,7 +2,7 @@ from flask import jsonify
 
 
 from flask_jwt_extended import (
-    JWTManager, verify_jwt_in_request, get_jwt
+    JWTManager, verify_jwt_in_request, get_jwt, jwt_required
 )
 from functools import wraps
 jwt = JWTManager()
