@@ -49,6 +49,37 @@ def post_day_off_request_service(facility_id, employee_id, data):
         sesion.close()
 
 
+def delete_request_service(employee_id, request_id):
+    session = db_session()
+    try:
+        request = session.query(DayOffRequest).filter_by(employee_id=employee_id, request_id=request_id).first()
+        if not request:
+            return None
+        delete_from_db(request, session)
+        return request
+    finally:
+        session.close()
+
+
+def update_request_service(employee_id, request_id, data):
+    session = db_session()
+    try:
+        validate_data(post_day_off_request_schema, data)
+        request = session.query(DayOffRequest).filter_by(employee_id=employee_id,
+                                                         request_id=request_id, date=data["date"]).first()
+        if not request:
+            raise InvalidAPIUsage("The request does not exist", 404)
+        request.type_of_vacation = data['type_of_vacation']
+        save_to_db(request, session)
+        res = DayOffRequestSchema().dump(request)
+        return res
+    except IntegrityError:
+        session.rollback()
+        raise InvalidAPIUsage("An error occurred while saving the employee", 500)
+    finally:
+        session.close()
+
+
 def has_request(employee_id, date, session):
     request = session.query(DayOffRequest).filter_by(employee_id=employee_id, date=date).first()
     if request:

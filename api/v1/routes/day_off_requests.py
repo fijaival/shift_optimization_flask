@@ -1,8 +1,8 @@
 from extensions import Base, jwt_required, self_facility_required
 from sqlalchemy.exc import SQLAlchemyError
 from flask import Blueprint, jsonify, request
-from ..service.day_off_requests import get_all_requests_services, post_day_off_request_service
-
+from ..service.day_off_requests import get_all_requests_services, post_day_off_request_service, delete_request_service, update_request_service
+from api.error import InvalidAPIUsage
 # ------------------------------------------------------
 
 from flask import Blueprint, jsonify, request
@@ -36,13 +36,18 @@ def add_request(facility_id, employee_id):
 @day_off_requests_bp.route('/facilities/<int:facility_id>/employees/<int:employee_id>/requests/<int:request_id>', methods=["DELETE"])
 @self_facility_required
 def delete_request(facility_id, employee_id, request_id):
-    pass
+    request = delete_request_service(employee_id, request_id)
+    if not request:
+        raise InvalidAPIUsage("Request not found", 404)
+    return jsonify({"message": "Request deleted successfully!"}), 200
 
 
 @day_off_requests_bp.route('/facilities/<int:facility_id>/employees/<int:employee_id>/requests/<int:request_id>', methods=["PUT"])
 @self_facility_required
 def update_request(facility_id, employee_id, request_id):
-    pass
+    data = request.json
+    res = update_request_service(employee_id, request_id, data)
+    return res, 201
 # 特定の月のシフト希望取得
 
 
