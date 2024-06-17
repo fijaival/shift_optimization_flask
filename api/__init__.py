@@ -1,0 +1,53 @@
+from flask import Flask, jsonify
+from config import Config
+from flask_cors import CORS
+from extensions import Base, jwt, db_session, init_db
+from api.v1 import api_v1_bp
+from flask_migrate import Migrate
+from .error import InvalidAPIUsage
+
+app = Flask(__name__)
+
+app.config.from_object(Config)
+CORS(app,
+     resources={r"/*": {"origins": ["http://localhost:8000/*"]}},
+     supports_credentials=True,
+     )
+
+migrate = Migrate()
+migrate.init_app(app, db_session, directory='migrations')
+
+
+@app.before_first_request
+def init():
+    init_db()
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db_session.remove()
+
+
+app.register_blueprint(api_v1_bp, url_prefix='/v1')
+
+print(app.config['SQLALCHEMY_DATABASE_URI'])
+
+# InvalidAPIUsageエラーをハンドリング
+
+
+@app.errorhandler(InvalidAPIUsage)
+def handle_invalid_usage(error):
+    print("よんだよ")
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
+
+
+# JWTのイベントハンドラーの設定
+
+
+def init_jwt(app):
+    jwt.init_app(app)
+
+
+init_jwt(app)
