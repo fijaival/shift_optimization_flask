@@ -22,6 +22,8 @@ def get_all_requests_services(facility_id, year, month):
         return res
     except SQLAlchemyError:
         raise InvalidAPIUsage("An error occurred while getting the requests", 500)
+    finally:
+        session.close()
 
 
 def post_day_off_request_service(facility_id, employee_id, data):

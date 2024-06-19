@@ -9,8 +9,11 @@ from .db_utils import validate_data, get_instance_by_id, save_to_db, delete_from
 
 def get_all_employees_service(facility_id):
     session = db_session()
-    employees = session.query(Employee).filter_by(facility_id=facility_id).all()
-    return employees
+    try:
+        employees = session.query(Employee).filter_by(facility_id=facility_id).all()
+        return employees
+    finally:
+        session.close()
 
 
 def add_employee_service(facility_id, data):
