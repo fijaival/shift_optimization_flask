@@ -15,9 +15,6 @@ CORS(app,
      supports_credentials=True,
      )
 
-migrate = Migrate()
-migrate.init_app(app, db_session, directory='migrations')
-
 jwt.init_app(app)
 
 
