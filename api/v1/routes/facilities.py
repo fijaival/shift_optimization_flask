@@ -6,17 +6,9 @@ from ..service.facilities import validate_and_create_facility_service, delete_fa
 facilities_bp = Blueprint('facilities', __name__)
 
 
-@facilities_bp.route('/', methods=['GET'])
-@jwt_required()
-def get_facilities():
-    """Get all facilities.これが必要になるときはないかもしれない。"""
-    return jsonify({"message": "Facilities data will be returned here."})
-
-
 @facilities_bp.route('/', methods=['POST'])
 # @jwt_required()
 def add_facility():
-    """Add a facility to the database.userより上の権限必要"""
     data = request.json
     res = validate_and_create_facility_service(data)
     return res, 201
