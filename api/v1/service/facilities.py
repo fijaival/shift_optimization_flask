@@ -4,7 +4,7 @@ from ..models import Facility, FacilitySchema, Qualification, Constraint
 from api.error import InvalidAPIUsage
 from sqlalchemy.exc import IntegrityError
 
-from .utils import validate_data, get_instance_by_id, save_to_db, delete_from_db
+from .db_utils import validate_data, get_instance_by_id, save_to_db, delete_from_db
 
 
 def validate_and_create_facility_service(data):

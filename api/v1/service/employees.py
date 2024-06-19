@@ -4,7 +4,7 @@ from extensions import db_session
 from api.error import InvalidAPIUsage
 from ..validators import post_employee_schema, put_employee_schema
 from ..models import Qualification, EmployeeConstraint, Constraint, Employee, Facility, EmployeeType, Dependency, EmployeeSchema
-from .utils import validate_data, get_instance_by_id, save_to_db, delete_from_db
+from .db_utils import validate_data, get_instance_by_id, save_to_db, delete_from_db
 
 
 def get_all_employees_service(facility_id):
