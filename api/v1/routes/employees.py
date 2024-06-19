@@ -11,11 +11,10 @@ employees_bp = Blueprint('employees', __name__)
 @self_facility_required
 def get_employee(facility_id):
     """Get all employees in a facility."""
-    employees = get_all_employees_service(facility_id)
+    res = get_all_employees_service(facility_id)
 
-    if not employees:
+    if not res:
         raise InvalidAPIUsage("No employees found", 404)
-    res = EmployeeSchema().dump(employees, many=True)
     return res, 200
 
 

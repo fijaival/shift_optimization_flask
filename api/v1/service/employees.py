@@ -11,7 +11,8 @@ def get_all_employees_service(facility_id):
     session = db_session()
     try:
         employees = session.query(Employee).filter_by(facility_id=facility_id).all()
-        return employees
+        res = EmployeeSchema().dump(employees, many=True)
+        return res
     finally:
         session.close()
 
