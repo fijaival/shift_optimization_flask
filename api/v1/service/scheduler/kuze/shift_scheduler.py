@@ -1,4 +1,4 @@
-from .shiftScheduler import ShiftScheduler
+from ..shiftScheduler import ShiftScheduler
 
 
 class KuzeFacilityOptimizeService(ShiftScheduler):
