@@ -19,8 +19,7 @@ def create_app():
 
     jwt.init_app(app)
 
-    @app.before_first_request
-    def init():
+    with app.app_context():
         init_db()
 
     @app.teardown_appcontext
