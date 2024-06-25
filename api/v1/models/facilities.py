@@ -8,20 +8,29 @@ from .employees import Employee
 from .auth import User
 from .constraints import Constraint, ConstraintSchema
 from .qualifications import Qualification, QualificationSchema
+from .tasks import Task, TaskSchema
 
 facility_constraints = Table(
     "facility_constraints",
     Base.metadata,
-    Column('facility_id', ForeignKey('facilities.facility_id', ondelete='CASCADE')),
-    Column('constraint_id', ForeignKey('constraints.constraint_id', ondelete='CASCADE')),
+    Column('facility_id', ForeignKey('facilities.facility_id', ondelete='CASCADE'), primary_key=True),
+    Column('constraint_id', ForeignKey('constraints.constraint_id', ondelete='CASCADE'), primary_key=True),
     UniqueConstraint('facility_id', 'constraint_id', name='uq_facility_constraint')
 )
 facility_qualifications = Table(
     "facility_qualifications",
     Base.metadata,
-    Column('facility_id', ForeignKey('facilities.facility_id', ondelete='CASCADE')),
-    Column('qualification_id', ForeignKey('qualifications.qualification_id', ondelete='CASCADE')),
+    Column('facility_id', ForeignKey('facilities.facility_id', ondelete='CASCADE'), primary_key=True),
+    Column('qualification_id', ForeignKey('qualifications.qualification_id', ondelete='CASCADE'), primary_key=True),
     UniqueConstraint('facility_id', 'qualification_id', name='uq_facility_qualification')
+)
+
+facility_tasks = Table(
+    "facility_tasks",
+    Base.metadata,
+    Column('facility_id', ForeignKey('facilities.facility_id', ondelete='CASCADE')),
+    Column('task_id', ForeignKey('tasks.task_id', ondelete='CASCADE')),
+    UniqueConstraint('facility_id', 'task_id', name='uq_facility_task')
 )
 
 
@@ -39,6 +48,8 @@ class Facility(Base):
         secondary=facility_constraints, backref=backref("facilities", passive_deletes=True))
     qualifications: Mapped[list[Qualification]] = relationship(
         secondary=facility_qualifications, backref=backref("facilities", passive_deletes=True))
+    tasks: Mapped[list[Task]] = relationship(
+        secondary=facility_tasks, backref=backref("facilities", passive_deletes=True))
 
     created_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now)
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now, onupdate=datetime.now)
@@ -49,3 +60,4 @@ class FacilitySchema(ma.SQLAlchemyAutoSchema):
         model = Facility
     qualifications = fields.Nested(QualificationSchema, many=True)
     constraints = fields.Nested(ConstraintSchema, many=True)
+    tasks = fields.Nested(TaskSchema, many=True)
