@@ -37,7 +37,7 @@ facility_tasks = Table(
 class Facility(Base):
     __tablename__ = 'facilities'
     facility_id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(191), nullable=False)
+    name: Mapped[str] = mapped_column(String(191), nullable=False, unique=True)
 
     # One to Many
     employees: Mapped[list["Employee"]] = relationship(backref='facility')
