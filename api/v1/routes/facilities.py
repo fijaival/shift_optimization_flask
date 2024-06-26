@@ -30,7 +30,7 @@ def get_facility(facility_id):
     """Get a facility by its ID."""
     facility = get_facility_service(facility_id)
     if not facility:
-        return jsonify({"message": "Facility not found"}), 404
+        return InvalidAPIUsage("Facility not found", 404)
     return facility, 200
 
 
@@ -40,50 +40,55 @@ def add_qualification_to_facility(facility_id):
     """Add a qualification to a facility."""
     data = request.json
     res = add_qualification_to_facility_service(facility_id, data)
+    if not res:
+        raise InvalidAPIUsage("Qualification not found", 404)
     return res, 201
 
 
 @facilities_bp.route('/<int:facility_id>/qualifications/<int:qualification_id>', methods=['DELETE'])
 @self_facility_required
 def delete_qualification_from_facility(facility_id, qualification_id):
-    try:
-        if delete_qualification_from_facility_service(facility_id, qualification_id):
-            return jsonify({"message": "Qualification deleted successfully!"}), 200
-    except InvalidAPIUsage as e:
-        return jsonify({"message": e.message}), e.status_code
+    res = delete_qualification_from_facility_service(facility_id, qualification_id)
+    if not res:
+        raise InvalidAPIUsage("Qualification not found", 404)
+    return res, 200
 
 
 @facilities_bp.route('/<int:facility_id>/constraints', methods=['POST'])
 @self_facility_required
 def add_constraint_to_facility(facility_id):
+    """Add a constraints to a facility."""
     data = request.json
     res = add_constraint_to_facility_service(facility_id, data)
+    if not res:
+        raise InvalidAPIUsage("Constraint not found", 404)
     return res, 201
 
 
 @facilities_bp.route('/<int:facility_id>/constraints/<int:constraint_id>', methods=['DELETE'])
 @self_facility_required
 def delete_constraint_from_facility(facility_id, constraint_id):
-    try:
-        if delete_constraint_from_facility_service(facility_id, constraint_id):
-            return jsonify({"message": "Constraint deleted successfully!"}), 200
-    except InvalidAPIUsage as e:
-        return jsonify({"message": e.message}), e.status_code
+    res = delete_constraint_from_facility_service(facility_id, constraint_id)
+    if not res:
+        raise InvalidAPIUsage("Constraint not found", 404)
+    return res, 200
 
 
 @facilities_bp.route('/<int:facility_id>/tasks', methods=['POST'])
 @self_facility_required
 def add_task_to_facility(facility_id):
+    """Add a tasks to a facility."""
     data = request.json
     res = add_task_to_facility_service(facility_id, data)
+    if not res:
+        raise InvalidAPIUsage("Task not found", 404)
     return res, 201
 
 
 @facilities_bp.route('/<int:facility_id>/tasks/<int:task_id>', methods=['DELETE'])
 @self_facility_required
 def delete_task_from_facility(facility_id, task_id):
-    try:
-        if delete_task_from_facility_service(facility_id, task_id):
-            return jsonify({"message": "task deleted successfully!"}), 200
-    except InvalidAPIUsage as e:
-        return jsonify({"message": e.message}), e.status_code
+    res = delete_task_from_facility_service(facility_id, task_id)
+    if not res:
+        raise InvalidAPIUsage("Task not found", 404)
+    return res, 200
