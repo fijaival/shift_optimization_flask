@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from api.error import InvalidAPIUsage
 from extensions import Base, jwt_required, self_facility_required
-from ..service.facilities import validate_and_create_facility_service, delete_facility_service, get_facility_service, add_qualification_to_facility_service, delete_qualification_from_facility_service, add_constraint_to_facility_service, delete_constraint_from_facility_service
+from ..service.facilities import validate_and_create_facility_service, delete_facility_service, get_facility_service, add_qualification_to_facility_service, delete_qualification_from_facility_service, add_constraint_to_facility_service, delete_constraint_from_facility_service, add_task_to_facility_service, delete_task_from_facility_service
 
 facilities_bp = Blueprint('facilities', __name__)
 
@@ -67,5 +67,23 @@ def delete_constraint_from_facility(facility_id, constraint_id):
     try:
         if delete_constraint_from_facility_service(facility_id, constraint_id):
             return jsonify({"message": "Constraint deleted successfully!"}), 200
+    except InvalidAPIUsage as e:
+        return jsonify({"message": e.message}), e.status_code
+
+
+@facilities_bp.route('/<int:facility_id>/tasks', methods=['POST'])
+@self_facility_required
+def add_task_to_facility(facility_id):
+    data = request.json
+    res = add_task_to_facility_service(facility_id, data)
+    return res, 201
+
+
+@facilities_bp.route('/<int:facility_id>/tasks/<int:task_id>', methods=['DELETE'])
+@self_facility_required
+def delete_task_from_facility(facility_id, task_id):
+    try:
+        if delete_task_from_facility_service(facility_id, task_id):
+            return jsonify({"message": "task deleted successfully!"}), 200
     except InvalidAPIUsage as e:
         return jsonify({"message": e.message}), e.status_code

@@ -9,3 +9,4 @@ from .employee_constraints import EmployeeConstraint
 from .qualifications import Qualification, QualificationSchema
 from .shifts import Shift
 from .facilities import Facility, FacilitySchema, facility_constraints, facility_qualifications
+from .tasks import Task, TaskSchema
