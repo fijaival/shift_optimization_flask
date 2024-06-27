@@ -12,7 +12,7 @@ def get_all_requests(facility_id):
     year = request.args.get('year')
     month = request.args.get('month')
     res = get_all_requests_services(facility_id, year, month)
-    return res, 200
+    return jsonify({"requests": res}), 200
 
 
 @day_off_requests_bp.route('/facilities/<int:facility_id>/employees/<int:employee_id>/requests', methods=["POST"])
@@ -37,4 +37,6 @@ def delete_request(facility_id, employee_id, request_id):
 def update_request(facility_id, employee_id, request_id):
     data = request.json
     res = update_request_service(employee_id, request_id, data)
+    if not res:
+        raise InvalidAPIUsage("Request not found", 404)
     return res, 201

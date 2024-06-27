@@ -10,7 +10,7 @@ employees_bp = Blueprint('employees', __name__)
 @self_facility_required
 def get_employee(facility_id):
     res = get_all_employees_service(facility_id)
-    return res, 200
+    return jsonify({"employees": res}), 200
 
 
 @employees_bp.route('/facilities/<int:facility_id>/employees', methods=["POST"])
