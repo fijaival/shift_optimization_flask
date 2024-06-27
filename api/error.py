@@ -9,6 +9,9 @@ class InvalidAPIUsage(Exception):
         self.payload = payload
 
     def to_dict(self):
-        rv = dict(self.payload or ())
-        rv['message'] = self.message
-        return rv
+        return {
+            "error": {
+                "message": self.message,
+                "code": self.status_code
+            }
+        }

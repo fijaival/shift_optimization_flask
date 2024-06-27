@@ -29,8 +29,10 @@ def my_expired_token_callback(jwt_header, jwt_payload):
     else:
         message = "refresh token has expired"
     response = jsonify({
-        "message": message,
-        "error": "token_expired"
+        "error": {
+            "message": "token has expired",
+            "code": 401
+        }
     })
     response.status_code = 401
     return response
@@ -41,8 +43,10 @@ def my_expired_token_callback(jwt_header, jwt_payload):
 @jwt.invalid_token_loader
 def my_invalid_token_callback(error_string):
     response = jsonify({
-        "message": error_string,
-        "error": "invalid_token"
+        "error": {
+            "message": error_string,
+            "code": 401
+        }
     })
     response.status_code = 401
     return response
@@ -53,8 +57,10 @@ def my_invalid_token_callback(error_string):
 @jwt.unauthorized_loader
 def custom_unauthorized_response(error_string):
     response = jsonify({
-        "message": error_string,
-        "error": "unauthorized"
+        "error": {
+            "message": error_string,
+            "code": 401
+        }
     })
     response.status_code = 401
     return response
@@ -79,8 +85,7 @@ def self_facility_required(fn):
         claims = get_jwt()
         if claims['facility_id'] != kwargs['facility_id']:  # カスタマイズした権限情報の確認
             response = jsonify({
-                "message": "Unauthorized",
-                "error": "unauthorized"
+                "error": {"massage": "unauthorized", "code": 403}
             })
             response.status_code = 401
             return response
@@ -98,8 +103,7 @@ def admin_required(fn):
         claims = get_jwt()
         if claims['is_admin'] != 1:  # カスタマイズした権限情報の確認
             response = jsonify({
-                "message": "Admins only",
-                "error": "unauthorized"
+                "error": {"massage": "unauthorized", "code": 403}
             })
             response.status_code = 403
             return response
