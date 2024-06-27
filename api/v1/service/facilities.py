@@ -1,5 +1,5 @@
 from flask import jsonify
-from ..validators import post_facility_schema, post_facility_atrubute_schema, put_facility_schema
+from ..validators import post_facility_schema, put_facility_schema
 from ..models import Facility, FacilitySchema, Qualification, Constraint, Task
 from api.error import InvalidAPIUsage
 from .db_utils import session_scope, validate_data
@@ -10,6 +10,7 @@ def validate_and_create_facility_service(data):
         validate_data(post_facility_schema, data)
         new_facility = Facility(**data)
         session.add(new_facility)
+        session.flush()
         res = FacilitySchema().dump(new_facility)
         return res
 
