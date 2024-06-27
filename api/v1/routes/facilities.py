@@ -1,18 +1,19 @@
 from flask import Blueprint, jsonify, request
 from api.error import InvalidAPIUsage
-from extensions import Base, jwt_required, self_facility_required
+from extensions import admin_required, jwt_required, self_facility_required
 from ..service.facilities import validate_and_create_facility_service, delete_facility_service, get_facility_service, update_facility_service
 
 facilities_bp = Blueprint('facilities', __name__)
 
 
 @facilities_bp.route('/', methods=['GET'])
+@admin_required
 def get_all_facilities():
     return jsonify({"message": "Hello, World!"}), 200
 
 
 @facilities_bp.route('/', methods=['POST'])
-# @jwt_required()
+@admin_required
 def add_facility():
     data = request.json
     res = validate_and_create_facility_service(data)
@@ -30,7 +31,7 @@ def get_facility(facility_id):
 
 
 @facilities_bp.route('/<int:facility_id>', methods=['DELETE'])
-@jwt_required()
+@admin_required
 def delete_facility(facility_id):
     facility = delete_facility_service(facility_id)
     if not facility:
@@ -39,7 +40,7 @@ def delete_facility(facility_id):
 
 
 @facilities_bp.route('/<int:facility_id>', methods=['PUT'])
-@jwt_required()
+@admin_required
 def update_facility(facility_id):
     "update employee information"
     data = request.json
