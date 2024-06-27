@@ -1,4 +1,3 @@
-from extensions import db_session
 from flask_jwt_extended import (create_access_token, create_refresh_token, get_jwt_identity, get_jwt,
                                 set_access_cookies, set_refresh_cookies, unset_jwt_cookies)
 from flask import jsonify
@@ -6,7 +5,6 @@ from datetime import datetime, timezone
 from ..models import User, UserSchema, TokenBlocklist
 from ..validators import post_user_schema, login_user_schema
 from api.error import InvalidAPIUsage
-from .db_utils import validate_data, save_to_db
 from .db_utils import session_scope, validate_data
 
 
