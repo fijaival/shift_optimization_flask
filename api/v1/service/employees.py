@@ -1,6 +1,4 @@
-import logging
-from sqlalchemy.exc import IntegrityError, SQLAlchemyError
-from extensions import db_session
+from datetime import datetime
 from api.error import InvalidAPIUsage
 from ..validators import post_employee_schema, put_employee_schema
 from ..models import Qualification, EmployeeConstraint, Constraint, Employee, Facility, EmployeeType, Dependency, EmployeeSchema
@@ -67,6 +65,7 @@ def update_employee_service(facility_id, employee_id, data):
         employee.first_name = data['first_name']
         employee.last_name = data['last_name']
         employee.employee_type_id = data['employee_type_id']
+        employee.updated_at = datetime.now()
 
         employee.employee_constraints.clear()
         for const_data in data['constraints']:

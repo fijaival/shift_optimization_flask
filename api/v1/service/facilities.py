@@ -1,4 +1,4 @@
-from flask import jsonify
+from datetime import datetime
 from ..validators import post_facility_schema, put_facility_schema
 from ..models import Facility, FacilitySchema, Qualification, Constraint, Task
 from api.error import InvalidAPIUsage
@@ -40,6 +40,7 @@ def update_facility_service(facility_id, data):
             raise InvalidAPIUsage("Facility not found", 404)
 
         facility.name = data["name"]
+        facility.updated_at = datetime.now()
         facility.constraints.clear()
         facility.qualifications.clear()
         facility.tasks.clear()
