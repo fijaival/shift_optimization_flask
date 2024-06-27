@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from api.v1.utils.error import InvalidAPIUsage
 from extensions import admin_required
-from ..service.constraints import get_constraints_service, add_constraint_service, delete_constraint_service
+from ..service.constraints import get_constraint_service, add_constraint_service, delete_constraint_service
 
 constraints_bp = Blueprint('costraint', __name__)
 
@@ -9,7 +9,7 @@ constraints_bp = Blueprint('costraint', __name__)
 @constraints_bp.route('/constraints', methods=['GET'])
 @admin_required
 def get_constraints():
-    res = get_constraints_service()
+    res = get_constraint_service()
     return jsonify({"constraints": res}), 200
 
 

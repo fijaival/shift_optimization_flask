@@ -4,7 +4,7 @@ from ..utils.context_maneger import session_scope
 from ..utils.validate import validate_data
 
 
-def get_constraints_service():
+def get_constraint_service():
     with session_scope() as session:
         employees = session.query(Constraint).all()
         res = ConstraintSchema().dump(employees, many=True)
