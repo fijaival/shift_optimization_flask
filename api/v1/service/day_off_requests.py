@@ -7,12 +7,23 @@ from .db_utils import session_scope, validate_data
 from sqlalchemy.orm.session import Session as BaseSession
 
 
-def get_all_requests_services(facility_id, year, month):
+def get_all_requests_service(facility_id, year, month):
     with session_scope() as session:
         request = session.query(DayOffRequest).join(Employee).filter(
             extract('year', DayOffRequest.date) == year,
             extract('month', DayOffRequest.date) == month,
             Employee.facility_id == facility_id
+        ).all()
+        res = DayOffRequestSchema().dump(request, many=True)
+        return res
+
+
+def get_requests_service(facility_id, employee_id, year, month):
+    with session_scope() as session:
+        request = session.query(DayOffRequest).filter(
+            extract('year', DayOffRequest.date) == year,
+            extract('month', DayOffRequest.date) == month,
+            DayOffRequest.employee_id == employee_id
         ).all()
         res = DayOffRequestSchema().dump(request, many=True)
         return res

@@ -1,12 +1,12 @@
 from api.error import InvalidAPIUsage
 from .scheduler import facility_class_map
-from .day_off_requests import get_all_requests_services
+from .day_off_requests import get_all_requests_service
 from .employees import get_all_employees_service
 
 
 def run_optimization(facility_id, year, month):
     employees_data = get_all_employees_service(facility_id)
-    day_off_requests = get_all_requests_services(facility_id, year, month)
+    day_off_requests = get_all_requests_service(facility_id, year, month)
     scheduler_class = facility_class_map.get(facility_id)
     last_month_shifts = None
     if not scheduler_class:
