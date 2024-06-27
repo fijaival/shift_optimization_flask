@@ -11,7 +11,7 @@ def signup():
     input_data = request.json
     res = signup_user(input_data)
     if not res:
-        raise InvalidAPIUsage("User already exists")
+        raise InvalidAPIUsage("This username is already used")
     return res, 201
 
 
