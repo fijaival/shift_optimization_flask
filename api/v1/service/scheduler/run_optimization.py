@@ -1,7 +1,7 @@
-from api.error import InvalidAPIUsage
-from .scheduler import facility_class_map
-from .day_off_requests import get_all_requests_service
-from .employees import get_all_employees_service
+from api.v1.utils.error import InvalidAPIUsage
+from . import facility_class_map
+from ..day_off_requests import get_all_requests_service
+from ..employees import get_all_employees_service
 
 
 def run_optimization(facility_id, year, month):

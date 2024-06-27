@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from api.error import InvalidAPIUsage
+from api.v1.utils.error import InvalidAPIUsage
 from extensions import self_facility_required
 from ..service.day_off_requests import get_all_requests_service, get_requests_service, post_day_off_request_service, delete_request_service, update_request_service
 

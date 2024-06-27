@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from extensions import self_facility_required
-from api.error import InvalidAPIUsage
-from ..service.run_optimization import run_optimization
+from api.v1.utils.error import InvalidAPIUsage
+from ..service.scheduler.run_optimization import run_optimization
 
 shifts_bp = Blueprint("shift", __name__)
 

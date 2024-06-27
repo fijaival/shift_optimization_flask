@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
-from api.error import InvalidAPIUsage
+from api.v1.utils.error import InvalidAPIUsage
 from ..service.auth import signup_user, login_user, refresh_token, logout_user
 
 auth_bp = Blueprint("auth", __name__)

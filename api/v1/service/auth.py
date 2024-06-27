@@ -4,8 +4,9 @@ from flask import jsonify
 from datetime import datetime, timezone
 from ..models import User, UserSchema, TokenBlocklist
 from ..validators import post_user_schema, login_user_schema
-from api.error import InvalidAPIUsage
-from .db_utils import session_scope, validate_data
+from api.v1.utils.error import InvalidAPIUsage
+from ..utils.context_maneger import session_scope
+from ..utils.validate import validate_data
 
 
 def signup_user(data):

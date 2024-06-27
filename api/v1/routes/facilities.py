@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
-from api.error import InvalidAPIUsage
-from extensions import admin_required, jwt_required, self_facility_required
+from api.v1.utils.error import InvalidAPIUsage
+from extensions import admin_required, self_facility_required
 from ..service.facilities import validate_and_create_facility_service, delete_facility_service, get_facility_service, update_facility_service
 
 facilities_bp = Blueprint('facilities', __name__)

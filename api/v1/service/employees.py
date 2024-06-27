@@ -1,9 +1,10 @@
 from datetime import datetime
-from api.error import InvalidAPIUsage
+from api.v1.utils.error import InvalidAPIUsage
+from sqlalchemy.orm.session import Session as BaseSession
 from ..validators import post_employee_schema, put_employee_schema
 from ..models import Qualification, EmployeeConstraint, Constraint, Employee, Facility, EmployeeType, Dependency, EmployeeSchema
-from .db_utils import session_scope, validate_data
-from sqlalchemy.orm.session import Session as BaseSession
+from ..utils.context_maneger import session_scope
+from ..utils.validate import validate_data
 
 
 def get_all_employees_service(facility_id):
