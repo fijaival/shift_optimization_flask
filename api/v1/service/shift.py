@@ -5,15 +5,6 @@ from ..utils.context_maneger import session_scope
 from ..utils.validate import validate_data
 
 
-def post_shifts_service(data):
-    with session_scope() as session:
-        shifts = data["shifts"]
-        validate_data(post_shifts_schema, shifts)
-        for item in shifts:
-            new_shift = Shift(**item)
-            session.add(new_shift)
-
-
 def get_shifts_service(facility_id, year, month):
     with session_scope() as session:
         employee = session.query(Employee).filter_by(facility_id=facility_id).all()
@@ -27,3 +18,12 @@ def get_shifts_service(facility_id, year, month):
         ).all()
         res = ShiftSchema().dump(shifts, many=True)
         return res
+
+
+def post_shifts_service(data):
+    with session_scope() as session:
+        shifts = data["shifts"]
+        validate_data(post_shifts_schema, shifts)
+        for item in shifts:
+            new_shift = Shift(**item)
+            session.add(new_shift)
