@@ -31,6 +31,22 @@ def post_shifts_service(data):
             session.add(new_shift)
 
 
+def delete_shifts_by_month_service(facility_id, year, month):
+    with session_scope() as session:
+        employee = session.query(Employee).filter_by(facility_id=facility_id).all()
+        if not employee:
+            return None
+        employee_ids = [emp.employee_id for emp in employee]
+        shifts = session.query(Shift).filter(
+            extract('year', Shift.date) == year,
+            extract('month', Shift.date) == month,
+            Shift.employee_id.in_(employee_ids)
+        ).all()
+        for shift in shifts:
+            session.delete(shift)
+        return shifts
+
+
 def update_shift_service(facility_id, shift_id, data):
     with session_scope() as session:
         validate_data(put_shifts_schema, data)
@@ -49,4 +65,9 @@ def update_shift_service(facility_id, shift_id, data):
 
 
 def delete_shift_service(shift_id):
-    pass
+    with session_scope() as session:
+        shift = session.query(Shift).filter_by(shift_id=shift_id).first()
+        if not shift:
+            return None
+        session.delete(shift)
+        return shift
