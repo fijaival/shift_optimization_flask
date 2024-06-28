@@ -24,7 +24,7 @@ def get_shifts(facility_id):
     month = request.args.get('month')
     res = get_shifts_service(facility_id, year, month)
     if not res:
-        raise InvalidAPIUsage("employee not found", 404)
+        raise InvalidAPIUsage("shifts not found", 404)
     return jsonify({"shifts": res}), 200
 
 
