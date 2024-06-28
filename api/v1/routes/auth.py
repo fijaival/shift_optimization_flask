@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from flask_jwt_extended import jwt_required
-from api.error import InvalidAPIUsage
+from api.v1.utils.error import InvalidAPIUsage
 from ..service.auth import signup_user, login_user, refresh_token, logout_user
 
 auth_bp = Blueprint("auth", __name__)
@@ -11,7 +11,7 @@ def signup():
     input_data = request.json
     res = signup_user(input_data)
     if not res:
-        raise InvalidAPIUsage("User already exists")
+        raise InvalidAPIUsage("This username is already used")
     return res, 201
 
 

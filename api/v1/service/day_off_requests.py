@@ -1,18 +1,15 @@
 from datetime import datetime
-from flask import request, jsonify
 from sqlalchemy import extract
-from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-
-from extensions import db_session
-from api.error import InvalidAPIUsage
+from api.v1.utils.error import InvalidAPIUsage
+from sqlalchemy.orm.session import Session as BaseSession
 from ..models import DayOffRequest, Employee, DayOffRequestSchema
-from ..validators import post_day_off_request_schema
-from .db_utils import validate_data, save_to_db, delete_from_db
+from ..validators import post_day_off_request_schema, put_day_off_request_schema
+from ..utils.context_maneger import session_scope
+from ..utils.validate import validate_data
 
 
-def get_all_requests_services(facility_id, year, month):
-    session = db_session()
-    try:
+def get_all_requests_service(facility_id, year, month):
+    with session_scope() as session:
         request = session.query(DayOffRequest).join(Employee).filter(
             extract('year', DayOffRequest.date) == year,
             extract('month', DayOffRequest.date) == month,
@@ -20,69 +17,56 @@ def get_all_requests_services(facility_id, year, month):
         ).all()
         res = DayOffRequestSchema().dump(request, many=True)
         return res
-    except SQLAlchemyError:
-        raise InvalidAPIUsage("An error occurred while getting the requests", 500)
-    finally:
-        session.close()
+
+
+def get_requests_service(facility_id, employee_id, year, month):
+    with session_scope() as session:
+        request = session.query(DayOffRequest).filter(
+            extract('year', DayOffRequest.date) == year,
+            extract('month', DayOffRequest.date) == month,
+            DayOffRequest.employee_id == employee_id
+        ).all()
+        res = DayOffRequestSchema().dump(request, many=True)
+        return res
 
 
 def post_day_off_request_service(facility_id, employee_id, data):
-    sesion = db_session()
-    try:
+    with session_scope() as session:
         validate_data(post_day_off_request_schema, data)
-        has_request(employee_id, data['date'], sesion)
+        has_request(employee_id, data['date'], session)
         new_request = DayOffRequest(
             employee_id=employee_id,
-            date=data['date'],
+            date=datetime.strptime(data['date'], '%Y-%m-%d'),
             type_of_vacation=data['type_of_vacation']
         )
-        save_to_db(new_request, sesion)
+        session.add(new_request)
+        session.flush()
         res = DayOffRequestSchema().dump(new_request)
         return res
-    except IntegrityError as e:
-        sesion.rollback()
-        if 'duplicate key value violates unique constraint' in str(e.orig):
-            raise InvalidAPIUsage("The employee already has a request for this date", 400)
-        elif 'foreign key constraint' in str(e.orig):
-            raise InvalidAPIUsage("The employee does not exist", 400)
-        else:
-            raise InvalidAPIUsage("An error occurred while saving the request", 500)
-    finally:
-        sesion.close()
 
 
 def delete_request_service(employee_id, request_id):
-    session = db_session()
-    try:
+    with session_scope() as session:
         request = session.query(DayOffRequest).filter_by(employee_id=employee_id, request_id=request_id).first()
         if not request:
             return None
-        delete_from_db(request, session)
+        session.delete(request)
         return request
-    finally:
-        session.close()
 
 
 def update_request_service(employee_id, request_id, data):
-    session = db_session()
-    try:
-        validate_data(post_day_off_request_schema, data)
-        request = session.query(DayOffRequest).filter_by(employee_id=employee_id,
-                                                         request_id=request_id, date=data["date"]).first()
+    with session_scope() as session:
+        validate_data(put_day_off_request_schema, data)
+        request = session.query(DayOffRequest).filter_by(employee_id=employee_id, request_id=request_id).first()
         if not request:
-            raise InvalidAPIUsage("The request does not exist", 404)
+            return None
         request.type_of_vacation = data['type_of_vacation']
-        save_to_db(request, session)
-        res = DayOffRequestSchema().dump(request)
-        return res
-    except IntegrityError:
-        session.rollback()
-        raise InvalidAPIUsage("An error occurred while saving the employee", 500)
-    finally:
-        session.close()
+        request.updated_at = datetime.now()
+        session.add(request)
+        return DayOffRequestSchema().dump(request)
 
 
-def has_request(employee_id, date, session):
+def has_request(employee_id, date, session: BaseSession):
     request = session.query(DayOffRequest).filter_by(employee_id=employee_id, date=date).first()
     if request:
         raise InvalidAPIUsage("The employee already has a request for this date", 400)

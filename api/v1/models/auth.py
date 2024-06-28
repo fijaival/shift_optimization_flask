@@ -35,7 +35,7 @@ class UserSchema(ma.SQLAlchemyAutoSchema):
 
     password_hash = ma.auto_field(load_only=True)
     facility = fields.Nested('FacilitySchema', only=(
-        'facility_id', 'facility_name'))
+        'facility_id', 'name'))
 
 
 class TokenBlocklist(Base):  # type: ignore

@@ -10,6 +10,8 @@ from datetime import datetime
 from ..shiftScheduler import ShiftScheduler
 from ....models import DayOffRequestSchema, EmployeeSchema
 from .employee import Employee, Full_Time_Employee
+from ..shift import Shift
+from ...tasks import get_task_id
 
 
 ##########################
@@ -498,6 +500,9 @@ class HanazonoFacilityOptimizeService(ShiftScheduler):
     #######################
     # 結果の表示
     #######################
+    # インスタンス化
+    # インスタンス化したものを辞書に
+    # その辞書をappend
     def replace_text(self, text):
         match = re.match(r'day(\d+)', text)
         if match:
@@ -507,55 +512,65 @@ class HanazonoFacilityOptimizeService(ShiftScheduler):
             return f'夕{match.group(1)}'
         return text
 
+    def get_task_id(self, task_name):
+        tasks_id = get_task_id(task_name)
+        print("tasks-----------------------")
+        print(tasks_id)
+
     def create_employees_schedule(self):
-        # 曜日データ
-        num_days = calendar.monthrange(self.year, self.month)[1]
-        dates = [datetime(self.year, self.month, day) for day in range(1, num_days + 1)]
-        weekdays_japanese = ['月', '火', '水', '木', '金', '土', '日']
-        column_names = [date.day for date in dates]
-        weekday_data = [weekdays_japanese[date.weekday()] for date in dates]
 
-        schedule = {"曜日": {column_names[i]: weekday_data[i] for i in range(len(column_names))}}
+        # # 　シフトのインスタンス化
+        schedule_list = []
+        task_id_map = {}
+        for work_type in self.work_types + ["有", "／"]:
+            task_id = get_task_id(work_type)
+            if task_id is None:
+                return None
+            task_id_map[work_type] = task_id
+        print(task_id_map)
 
-        # 従業員の勤務表
-        day_labels = [day + 1 for day in self.days]
-        for employee in self.employees:
-            for i in range(2):
-                key = f"{employee.name} - 業務{i+1}"
-                schedule[key] = {day: "" for day in day_labels}
-
-        # 各従業員のスケジュールを割り当て
         for employee in self.employees:
             for day in self.days:
+                if day in employee.day_off_requests:
+                    continue
+                date = datetime(self.year, self.month, day+1)
+                # 有給の時
+                if pulp.value(employee.paid_vars[day]) == 1:
+                    shift = Shift(employee_id=employee.id, date=date, shift_number=1, task_id=task_id_map["有"])
+                    shift_dict = shift.to_dict()
+                    schedule_list.append(shift_dict)
                 assigned_works = []
                 for work_type in self.work_types:
                     if pulp.value(employee.shift_vars[day, work_type]) == 1:
-                        assigned_works.append(self.replace_text(work_type))
-
-                if pulp.value(employee.paid_vars[day]) == 1:
-                    schedule[f"{employee.name} - 業務1"][day + 1] = "有休"
-                elif day in employee.day_off_requests:
-                    continue
-                elif not assigned_works:
-                    schedule[f"{employee.name} - 業務1"][day + 1] = "／"
-                for i, work in enumerate(assigned_works):
-                    schedule[f"{employee.name} - 業務{i+1}"][day + 1] = work
-
-        schedule["二人体制の日"] = {day + 1: "夕1" if "夕1" not in [schedule[key][day + 1]
-                                                            for key in schedule.keys() if key != "曜日"] else "" for day in self.days}
-        schedule[""] = {day + 1: "" for day in self.days}
+                        assigned_works.append(work_type)
+                # 勤務の時
+                if assigned_works:
+                    for i, work in enumerate(assigned_works):
+                        shift = Shift(employee_id=employee.id, date=date, shift_number=i +
+                                      1, task_id=task_id_map[work])
+                        shift_dict = shift.to_dict()
+                        schedule_list.append(shift_dict)
+                # 休みの時
+                else:
+                    shift = Shift(employee_id=employee.id, date=date, shift_number=1, task_id=task_id_map["／"])
+                    shift_dict = shift.to_dict()
+                    schedule_list.append(shift_dict)
 
         for e in self.full_time_employees:
-            for i in range(2):
-                key = f"{e.name} - 業務{i+1}"
-                schedule[key] = {day: "" for day in day_labels}
-                for day in self.days:
-                    if pulp.value(e.paid_vars[day]) == 1:
-                        schedule[key][day + 1] = "有休"
-                    elif pulp.value(e.shift_vars[day]) == 0:
-                        schedule[key][day + 1] = "／"
+            for day in self.days:
+                date = datetime(self.year, self.month, day+1)
+                if pulp.value(e.paid_vars[day]) == 1:
+                    shift = Shift(employee_id=e.id, date=date, shift_number=1, task_id=task_id_map["有"])
+                elif pulp.value(e.shift_vars[day]) == 0:
+                    shift = Shift(employee_id=e.id, date=date, shift_number=1, task_id=task_id_map["／"])
+                else:
+                    continue
+                shift_dict = shift.to_dict()
 
-        return schedule
+                schedule_list.append(shift_dict)
+        print(schedule_list)
+
+        return schedule_list
 
     def solve(self):
         self.create_variables()
@@ -566,6 +581,6 @@ class HanazonoFacilityOptimizeService(ShiftScheduler):
 
         if solution_status == 'Optimal':
             schedule = self.create_employees_schedule()
-            return json.dumps(schedule, ensure_ascii=False, indent=4)
-        else:
-            return None
+            if schedule:
+                return schedule
+        return None

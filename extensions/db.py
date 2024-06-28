@@ -14,7 +14,7 @@ database_uri = 'mysql+pymysql://{user}:{password}@{host}:{PORT}/{db_name}?charse
     'db_name': os.getenv('DB_NAME'),
 })
 engine = create_engine(database_uri, pool_pre_ping=True)
-db_session = scoped_session(sessionmaker(autocommit=False, autoflush=False, bind=engine))
+db_session = scoped_session(sessionmaker(autocommit=False, autoflush=True, bind=engine))
 Base = declarative_base()
 Base.query = db_session.query_property()
 

@@ -4,7 +4,7 @@ from flask_cors import CORS
 from extensions import jwt, db_session, init_db
 from api.v1 import api_v1_bp
 from flask_migrate import Migrate
-from .error import InvalidAPIUsage
+from .v1.utils.error import InvalidAPIUsage
 
 app = Flask(__name__)
 app.register_blueprint(api_v1_bp, url_prefix='/v1')
