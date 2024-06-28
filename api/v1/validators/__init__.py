@@ -5,3 +5,4 @@ from .day_off_requests import post_day_off_request_schema, put_day_off_request_s
 from .constraints import post_constraint_schema
 from .qualifications import post_qualification_schema
 from .tasks import post_task_schema
+from .shifts import post_shifts_schema

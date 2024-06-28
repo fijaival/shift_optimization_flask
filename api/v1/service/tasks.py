@@ -27,3 +27,11 @@ def delete_task_service(task_id):
             return None
         session.delete(task)
         return task
+
+
+def get_task_id(task_name):
+    with session_scope() as session:
+        task = session.query(Task).filter_by(name=task_name).first()
+        if not task:
+            return None
+        return task.task_id
