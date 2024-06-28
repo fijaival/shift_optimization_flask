@@ -1,4 +1,4 @@
-from extensions import Base, ma
+from extensions import Base, ma, fields
 from datetime import datetime
 from datetime import date as dt_date
 
@@ -21,12 +21,15 @@ class Shift(Base):
                                                  default=datetime.now, onupdate=datetime.now)
 
     __table_args__ = (
-        UniqueConstraint('employee_id', 'date', "task_id", name='uq_shift'),
+        UniqueConstraint('employee_id', 'date', "shift_number", name='uq_shift'),
     )
 
 
 class ShiftSchema(ma.SQLAlchemyAutoSchema):
     class Meta:
         model = Shift
+    employee_id = fields.Integer(required=True)
+    task_id = fields.Integer(required=True)
+
     created_at = ma.auto_field(load_only=True)
     updated_at = ma.auto_field(load_only=True)
