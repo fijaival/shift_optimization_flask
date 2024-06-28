@@ -1,6 +1,8 @@
-from ..validators import post_shifts_schema
+from datetime import datetime
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import extract
-from ..models import Shift, ShiftSchema, Employee
+from ..validators import post_shifts_schema, put_shifts_schema
+from ..models import Shift, ShiftSchema, Employee, Facility
 from ..utils.context_maneger import session_scope
 from ..utils.validate import validate_data
 
@@ -27,3 +29,24 @@ def post_shifts_service(data):
         for item in shifts:
             new_shift = Shift(**item)
             session.add(new_shift)
+
+
+def update_shift_service(facility_id, shift_id, data):
+    with session_scope() as session:
+        validate_data(put_shifts_schema, data)
+        shift = session.query(Shift).filter_by(shift_id=shift_id).first()
+        if not shift:
+            return None
+        if shift.task_id != data["task_id"]:
+            facility = session.query(Facility).filter_by(facility_id=facility_id).first()
+            if data["task_id"] not in [task.task_id for task in facility.tasks]:
+                raise ValueError("this task is not in the facility tasks")
+            shift.task_id = data["task_id"]
+        shift.shift_number = data["shift_number"]
+        shift.updated_at = datetime.now()
+        session.add(shift)
+        return ShiftSchema().dump(shift)
+
+
+def delete_shift_service(shift_id):
+    pass

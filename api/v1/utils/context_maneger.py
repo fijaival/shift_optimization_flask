@@ -23,5 +23,10 @@ def session_scope():
             raise InvalidAPIUsage("An error occurred due to foreign key constraints", 400)
         else:
             raise InvalidAPIUsage("An error occurred while saving the instance", 500)
+    except Exception as e:
+        message = e.args[0]
+        print(message)
+        session.rollback()
+        raise InvalidAPIUsage(message, 500)
     finally:
         session.close()

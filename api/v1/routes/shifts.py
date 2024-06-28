@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from extensions import self_facility_required
 from api.v1.utils.error import InvalidAPIUsage
 from ..service.scheduler.run_optimization import run_optimization
-from ..service.shift import post_shifts_service, get_shifts_service
+from ..service.shift import post_shifts_service, get_shifts_service, update_shift_service, delete_shift_service
 shifts_bp = Blueprint("shift", __name__)
 
 
@@ -34,3 +34,13 @@ def confirm_shift(facility_id):
     data = request.json
     post_shifts_service(data)
     return jsonify({"message": "Shifts confirmed successfully!"}), 200
+
+
+@shifts_bp.route('/facilities/<int:facility_id>/shifts/<int:shift_id>', methods=['PUT'])
+@self_facility_required
+def update_shift(facility_id, shift_id):
+    data = request.json
+    res = update_shift_service(facility_id, shift_id, data)
+    if not res:
+        raise InvalidAPIUsage("Shift not found", 404)
+    return res, 200

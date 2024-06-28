@@ -8,4 +8,5 @@ class PostShiftsSchema(Schema):
     task_id = fields.Int(required=True)
 
 
+put_shifts_schema = PostShiftsSchema()
 post_shifts_schema = PostShiftsSchema(many=True)
