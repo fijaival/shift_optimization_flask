@@ -97,7 +97,7 @@ flask run
   "created_at": "2024-06-11T17:35:33",
   "facility": {
     "facility_id": 1,
-    "facility_name": ""
+    "name": ""
   },
   "is_admin": false,
   "updated_at": "2024-06-11T17:35:33",
@@ -163,15 +163,24 @@ ResponseBody:
 **ResponseBody**:
 
 ```json
-[
+{
+  "employees": [
     {
-        "id": "integer",
-        "name": "string",
-        "position": "string",
-        "salary": "number",
-        "hire_date": "string" (ISO 8601 format, e.g., "2023-06-01T12:00:00Z")
+      "created_at": "2024-06-27T12:48:17",
+      "dependencies": [],
+      "employee_constraints": [],
+      "employee_id": 10,
+      "employee_type": {
+        "employee_type_id": 3,
+        "type_name": "非常勤調理員"
+      },
+      "first_name": "first_name",
+      "last_name": "last_name",
+      "qualifications": [],
+      "updated_at": "2024-06-27T12:59:24"
     }
-]
+  ]
+}
 ```
 
 ## Register employees
@@ -282,7 +291,7 @@ ResponseBody:
 
 ```json
 {
-  "facility_name": "string"
+  "name": "string"
 }
 ```
 
@@ -298,36 +307,23 @@ ResponseBody:
 **Path:** `/facilities/<int:facility_id>`  
 **Request Body:**
 
-## Register constraint
+## edit facility info
 
 **Method:** POST
-**Path:** `/facilities/<int:facility_id>/constraints`  
+**Path:** `/facilities/<int:facility_id>`  
 **Request Body:**
 
 ```json
 {
-  "name": "string"
+  "name": "test_facility",
+  "constraints": [{ "constraint_id": 1 }, { "constraint_id": 3 }],
+  "qualifications": [{ "qualification_id": 1 }, { "qualification_id": 3 }],
+  "tasks": [
+    { "task_id": 2 },
+    { "task_id": 4 },
+    { "task_id": 1 },
+    { "task_id": 3 },
+    { "task_id": 5 }
+  ]
 }
 ```
-
-## Delete constraint
-
-**Method:** DELETE
-**Path:** `/facilities/<int:facility_id>/constraints`  
-**Request Body:**
-
-## Register qualification
-
-**Path:** `/facilities/<int:facility_id>/qualificaitions`  
-**Request Body:**
-
-```json
-{
-  "name": "string"
-}
-```
-
-## Delete qualificaion
-
-**Path:** `/facilities/<int:facility_id>/constraints`  
-**Request Body:**
