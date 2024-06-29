@@ -1,4 +1,5 @@
-from extensions import Base, ma, fields
+from extensions import Base
+from marshmallow import fields, Schema
 from datetime import datetime
 from datetime import date as dt_date
 
@@ -25,11 +26,11 @@ class Shift(Base):
     )
 
 
-class ShiftSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Shift
-    employee_id = fields.Integer(required=True)
-    task_id = fields.Integer(required=True)
-
-    created_at = ma.auto_field(load_only=True)
-    updated_at = ma.auto_field(load_only=True)
+class ShiftSchema(Schema):
+    shift_id = fields.Int()
+    employee_id = fields.Int(required=True)
+    task_id = fields.Int(required=True)
+    date = fields.Date(required=True)
+    shift_number = fields.Int(required=True)
+    created_at = fields.DateTime(dump_only=True)
+    updated_at = fields.DateTime(dump_only=True)

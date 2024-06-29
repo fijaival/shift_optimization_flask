@@ -1,4 +1,5 @@
-from extensions import Base, ma, fields
+from extensions import Base
+from marshmallow import fields, Schema
 from sqlalchemy import Column, String, ForeignKey, UniqueConstraint, Table
 from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
 from datetime import datetime
@@ -55,9 +56,11 @@ class Facility(Base):
     updated_at: Mapped[datetime] = mapped_column(nullable=False, default=datetime.now, onupdate=datetime.now)
 
 
-class FacilitySchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Facility
+class FacilitySchema(Schema):
+
+    facility_id = fields.Int()
+    name = fields.Str()
+
     qualifications = fields.Nested(QualificationSchema, many=True)
     constraints = fields.Nested(ConstraintSchema, many=True)
     tasks = fields.Nested(TaskSchema, many=True)

@@ -3,7 +3,6 @@ from config import Config
 from flask_cors import CORS
 from extensions import jwt, db_session, init_db
 from api.v1 import api_v1_bp
-from flask_migrate import Migrate
 from .v1.utils.error import InvalidAPIUsage
 
 

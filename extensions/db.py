@@ -1,11 +1,11 @@
 import os
-from flask_marshmallow import Marshmallow, fields
+
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import scoped_session, sessionmaker
 from sqlalchemy.orm import declarative_base
 
 
-ma = Marshmallow()
 database_uri = 'mysql+pymysql://{user}:{password}@{host}:{PORT}/{db_name}?charset=utf8'.format(**{
     'user': os.getenv('DB_USER'),
     'password': os.getenv('DB_PASSWORD'),
@@ -22,6 +22,3 @@ Base.query = db_session.query_property()
 def init_db():
     import api.v1.models
     Base.metadata.create_all(bind=engine)
-
-
-fields = fields.fields

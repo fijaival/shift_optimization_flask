@@ -1,4 +1,5 @@
-from extensions import Base, ma, fields
+from extensions import Base
+from marshmallow import Schema, fields
 from datetime import datetime
 
 from sqlalchemy import ForeignKey, UniqueConstraint, UniqueConstraint, DateTime
@@ -24,9 +25,9 @@ class EmployeeConstraint(Base):
     )
 
 
-class EmployeeConstraintSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = EmployeeConstraint
-    created_at = ma.auto_field(load_only=True)
-    updated_at = ma.auto_field(load_only=True)
+class EmployeeConstraintSchema(Schema):
+    employee_id = fields.Int()
+    constraint_id = fields.Int()
+    value = fields.Int()
+
     constraint = fields.Nested(ConstraintSchema, only=('constraint_id', 'name'))

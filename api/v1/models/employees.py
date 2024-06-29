@@ -1,5 +1,6 @@
-from extensions import Base, ma, fields
+from extensions import Base
 from datetime import datetime
+from marshmallow import Schema, fields
 
 from sqlalchemy import Integer, String,  ForeignKey, Table, Column, UniqueConstraint, UniqueConstraint
 from sqlalchemy.orm import relationship, Mapped, mapped_column, backref
@@ -85,9 +86,11 @@ class Dependency(Base):
     dependent_employee = relationship('Employee', foreign_keys=[dependent_employee_id], back_populates='dependents')
 
 
-class EmployeeSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Employee
+class EmployeeSchema(Schema):
+    employee_id = fields.Int()
+    facility_id = fields.Int()
+    first_name = fields.Str()
+    last_name = fields.Str()
 
     employee_type = fields.Nested(EmployeeTypeSchema)
     qualifications = fields.Nested(QualificationSchema, many=True)
@@ -95,9 +98,10 @@ class EmployeeSchema(ma.SQLAlchemyAutoSchema):
     dependencies = fields.Nested('DependencySchema', many=True)
 
 
-class DependencySchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Dependency
-    created_at = ma.auto_field(load_only=True)
-    updated_at = ma.auto_field(load_only=True)
+class DependencySchema(Schema):
+    dependency_id = fields.Int()
+    employee_id = fields.Int()
+    dependent_employee_id = fields.Int()
+    created_at = fields.Date(load_only=True)
+    updated_at = fields.Date(load_only=True)
     dependent_employee = fields.Nested("EmployeeSchema", only=('employee_id', 'first_name', 'last_name'))

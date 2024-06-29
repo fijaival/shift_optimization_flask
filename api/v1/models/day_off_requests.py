@@ -1,8 +1,9 @@
-from extensions import Base, ma, fields
+from extensions import Base
 from datetime import datetime
 from datetime import date as dt_date
 from sqlalchemy import String, Date, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
+from marshmallow import Schema, fields
 
 
 class DayOffRequest(Base):
@@ -20,7 +21,12 @@ class DayOffRequest(Base):
     )
 
 
-class DayOffRequestSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = DayOffRequest
+class DayOffRequestSchema(Schema):
+    request_id = fields.Int()
+    employee_id = fields.Int(required=True)
+    date = fields.Date(required=True)
+    type_of_vacation = fields.Str(required=True)
+    created_at = fields.DateTime(dump_only=True)
+    updated_at = fields.DateTime(dump_only=True)
+
     employee = fields.Nested('EmployeeSchema', only=('employee_id', 'first_name', 'last_name'))

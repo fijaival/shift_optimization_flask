@@ -1,4 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
 
 from .auth import User, UserSchema, TokenBlocklist
 from .constraints import Constraint, ConstraintSchema

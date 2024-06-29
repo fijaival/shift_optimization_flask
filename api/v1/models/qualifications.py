@@ -1,4 +1,6 @@
-from extensions import Base, ma
+from extensions import Base
+from marshmallow import fields, Schema
+
 from datetime import datetime
 
 from sqlalchemy import String
@@ -15,6 +17,8 @@ class Qualification(Base):
                                                  default=datetime.now, onupdate=datetime.now)
 
 
-class QualificationSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Qualification
+class QualificationSchema(Schema):
+    qualification_id = fields.Int()
+    name = fields.Str()
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()

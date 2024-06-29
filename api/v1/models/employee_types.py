@@ -1,5 +1,6 @@
-from extensions import Base, ma
+from extensions import Base
 from datetime import datetime
+from marshmallow import Schema, fields
 from sqlalchemy import String, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -14,8 +15,8 @@ class EmployeeType(Base):
                                                  default=datetime.now, onupdate=datetime.now)
 
 
-class EmployeeTypeSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = EmployeeType
-    created_at = ma.auto_field(load_only=True)
-    updated_at = ma.auto_field(load_only=True)
+class EmployeeTypeSchema(Schema):
+    employee_type_id = fields.Int()
+    type_name = fields.Str()
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()

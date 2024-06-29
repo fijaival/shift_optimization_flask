@@ -1,4 +1,5 @@
-from extensions import Base, ma
+from extensions import Base
+from marshmallow import Schema, fields
 from datetime import datetime
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -14,8 +15,8 @@ class Task(Base):
                                                  default=datetime.now, onupdate=datetime.now)
 
 
-class TaskSchema(ma.SQLAlchemyAutoSchema):
-    class Meta:
-        model = Task
-    created_at = ma.auto_field(load_only=True)
-    updated_at = ma.auto_field(load_only=True)
+class TaskSchema(Schema):
+    task_id = fields.Int()
+    name = fields.Str()
+    created_at = fields.DateTime()
+    updated_at = fields.DateTime()

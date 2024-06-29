@@ -1,9 +1,9 @@
 from datetime import datetime
-from extensions import Base, ma, fields
-
+from extensions import Base
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
+from marshmallow import Schema, fields
 
 
 class User(Base):
@@ -29,11 +29,11 @@ class User(Base):
         return check_password_hash(self.password_hash, password)
 
 
-class UserSchema(ma.SQLAlchemyAutoSchema):
+class UserSchema(Schema):
     class Meta:
         model = User
 
-    password_hash = ma.auto_field(load_only=True)
+    password_hash = fields.Str(load_only=True)
     facility = fields.Nested('FacilitySchema', only=(
         'facility_id', 'name'))
 
