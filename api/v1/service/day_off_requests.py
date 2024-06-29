@@ -1,11 +1,10 @@
 from datetime import datetime
 from sqlalchemy import extract
-from api.v1.utils.error import InvalidAPIUsage
-from sqlalchemy.orm.session import Session as BaseSession
 from ..models import DayOffRequest, Employee, DayOffRequestSchema
 from ..validators import post_day_off_request_schema, put_day_off_request_schema
 from ..utils.context_maneger import session_scope
 from ..utils.validate import validate_data
+from ..utils.has_employee import has_employee
 
 
 def get_all_requests_service(facility_id, year, month):
@@ -33,7 +32,7 @@ def get_requests_service(facility_id, employee_id, year, month):
 def post_day_off_request_service(facility_id, employee_id, data):
     with session_scope() as session:
         validate_data(post_day_off_request_schema, data)
-        has_request(employee_id, data['date'], session)
+        has_employee(facility_id, employee_id, session)
         new_request = DayOffRequest(
             employee_id=employee_id,
             date=datetime.strptime(data['date'], '%Y-%m-%d'),
@@ -64,9 +63,3 @@ def update_request_service(employee_id, request_id, data):
         request.updated_at = datetime.now()
         session.add(request)
         return DayOffRequestSchema().dump(request)
-
-
-def has_request(employee_id, date, session: BaseSession):
-    request = session.query(DayOffRequest).filter_by(employee_id=employee_id, date=date).first()
-    if request:
-        raise InvalidAPIUsage("The employee already has a request for this date", 400)
